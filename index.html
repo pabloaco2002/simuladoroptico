@@ -1007,6 +1007,52 @@
       width: 100%;
     }
 
+    /* CONTROLES AVANZADOS DE FRONTOFOCÓMETRO (RISLEY, LUZ, TINTE) */
+    .fronto-addon-card {
+      background: #090f1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .fronto-pill-segmented {
+      display: flex;
+      background: #070d17;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .fronto-pill-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      flex: 1;
+      text-align: center;
+    }
+
+    .fronto-pill-btn:hover {
+      color: #fff;
+    }
+
+    .fronto-pill-btn.active {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
     /* VISTA: MODO QUIZ */
     .quiz-container {
       background: var(--bg-card);
@@ -1725,20 +1771,41 @@
           
           <!-- BARRA SUPERIOR DE HERRAMIENTAS DE BANCO ÓPTICO -->
           <div class="fronto-header-toolbar" style="grid-column: span 2;">
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-                Modo de Medición:
-              </span>
-              <div class="fronto-mode-segmented">
-                <button class="fronto-mode-btn active" id="btnModeUnmounted" onclick="setFrontoLensMode('unmounted')">
-                  ⚪ Lente Suelta (En Bruto)
-                </button>
-                <button class="fronto-mode-btn" id="btnModeOD" onclick="setFrontoLensMode('frame_od')">
-                  👓 Gafa Montada: Ojo Derecho (OD)
-                </button>
-                <button class="fronto-mode-btn" id="btnModeOS" onclick="setFrontoLensMode('frame_os')">
-                  👓 Gafa Montada: Ojo Izquierdo (OI)
-                </button>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <!-- Modo montura -->
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Modo:</span>
+                <div class="fronto-mode-segmented">
+                  <button class="fronto-mode-btn active" id="btnModeUnmounted" onclick="setFrontoLensMode('unmounted')">
+                    ⚪ Lente Suelta
+                  </button>
+                  <button class="fronto-mode-btn" id="btnModeOD" onclick="setFrontoLensMode('frame_od')">
+                    👓 Gafa OD
+                  </button>
+                  <button class="fronto-mode-btn" id="btnModeOS" onclick="setFrontoLensMode('frame_os')">
+                    👓 Gafa OI
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tinte de Lente (Lentes de Sol) -->
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tinte:</span>
+                <div class="fronto-pill-segmented">
+                  <button class="fronto-pill-btn active" id="btnTintClear" onclick="setFrontoLensTint('clear')" title="Lente transparente estándar">⚪ Neutro</button>
+                  <button class="fronto-pill-btn" id="btnTintG15" onclick="setFrontoLensTint('g15')" title="Gafa de sol verde grisáceo G-15 (Ray-Ban)">🕶️ G-15</button>
+                  <button class="fronto-pill-btn" id="btnTintBrown" onclick="setFrontoLensTint('brown')" title="Gafa de sol marrón ámbar">🕶️ Marrón</button>
+                  <button class="fronto-pill-btn" id="btnTintDark" onclick="setFrontoLensTint('dark')" title="Gafa de sol gris oscuro Categoría 3">🕶️ Gris 3</button>
+                </div>
+              </div>
+
+              <!-- Filtro de Luz Ocular -->
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filtro:</span>
+                <div class="fronto-pill-segmented">
+                  <button class="fronto-pill-btn active" id="btnFilterGreen" onclick="setFrontoLightFilter('green')" title="Luz verde monocromática de mercurio/LED (546 nm ISO)">🟢 Verde 546nm</button>
+                  <button class="fronto-pill-btn" id="btnFilterWhite" onclick="setFrontoLightFilter('white')" title="Luz incandescente blanca con aberración cromática de dispersión">⚪ Halógena</button>
+                </div>
               </div>
             </div>
 
@@ -1752,15 +1819,19 @@
 
           <!-- LADO IZQUIERDO: OCULAR Y MARCADOR -->
           <div class="fronto-view-box">
-            <!-- SELECTOR DE TIPO DE MIRA -->
+            <!-- SELECTOR DE TIPO DE MIRA (3 OPCIONES) -->
             <div class="fronto-target-switch">
-              <button class="target-btn active" id="btnTargetCross" onclick="setFrontoTargetType('cross')">
+              <button class="target-btn active" id="btnTargetCross3x2" onclick="setFrontoTargetType('cross_3x2')" title="Mira clásica Reichert / Marco: 3 líneas finas para esfera y 2 líneas gruesas para cilindro">
                 <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/></svg>
-                Mira Americana (Cruz de Líneas)
+                Mira 3x2 (Reichert/Marco)
               </button>
-              <button class="target-btn" id="btnTargetDots" onclick="setFrontoTargetType('dots')">
+              <button class="target-btn" id="btnTargetCross3x3" onclick="setFrontoTargetType('cross_3x3')" title="Mira Topcon: 3 finas x 3 gruesas">
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/></svg>
+                Mira 3x3 (Topcon)
+              </button>
+              <button class="target-btn" id="btnTargetDots" onclick="setFrontoTargetType('dots')" title="Mira europea de corona de 16 puntos">
                 <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><circle cx="17.66" cy="6.34" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="17.66" cy="17.66" r="2"/><circle cx="12" cy="20" r="2"/><circle cx="6.34" cy="17.66" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="6.34" cy="6.34" r="2"/></svg>
-                Mira Europea (Corona de Puntos)
+                Corona Puntos
               </button>
             </div>
 
@@ -1905,6 +1976,65 @@
                 <div id="frontoPadNote" style="font-size: 0.79rem; color: var(--text-muted); line-height: 1.45; flex: 1;">
                   Arrastra con el ratón/dedo directamente sobre el ocular o usa la cruceta para alinear el centro óptico con el cruce de la retícula antes de medir.
                 </div>
+              </div>
+            </div>
+
+            <!-- MANDO 4: PRISMA COMPENSADOR DE RISLEY (0 A 20Δ) -->
+            <div class="drum-control fronto-addon-card" id="risleyControlBox">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                  <span>4. Prisma Auxiliar de Risley:</span>
+                </span>
+                <button class="step-btn" id="btnToggleRisley" style="width: auto; padding: 4px 10px; font-size: 0.74rem; background: #1e293b; color: #38bdf8;" onclick="toggleRisleyPrism()">
+                  🌀 Acoplar Prisma
+                </button>
+              </div>
+
+              <div id="risleyControlsArea" style="display: none; flex-direction: column; gap: 8px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
+                <!-- Potencia del prisma -->
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px;">
+                    <span>Potencia Prismática:</span>
+                    <strong id="risleyPowerVal" style="color: #38bdf8; font-family: monospace;">0.0 Δ</strong>
+                  </div>
+                  <div class="slider-row">
+                    <button class="drum-fine-btn" onclick="stepRisleyPower(-0.5)">-0.5</button>
+                    <input type="range" id="risleyPowerInput" min="0" max="20" step="0.5" value="0" style="accent-color: #38bdf8;" oninput="setRisleyPower(parseFloat(this.value))">
+                    <button class="drum-fine-btn" onclick="stepRisleyPower(0.5)">+0.5</button>
+                  </div>
+                </div>
+
+                <!-- Ángulo de Base -->
+                <div>
+                  <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px;">
+                    <span>Orientación de Base:</span>
+                    <strong id="risleyBaseVal" style="color: #4ade80; font-family: monospace;">0° (Base Temp)</strong>
+                  </div>
+                  <div class="slider-row">
+                    <button class="drum-fine-btn" onclick="stepRisleyBase(-5)">-5°</button>
+                    <input type="range" id="risleyBaseInput" min="0" max="360" step="1" value="0" style="accent-color: #4ade80;" oninput="setRisleyBase(parseInt(this.value, 10))">
+                    <button class="drum-fine-btn" onclick="stepRisleyBase(5)">+5°</button>
+                  </div>
+                  <div style="display: flex; gap: 4px; margin-top: 5px;">
+                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(90)">90° B.Sup</button>
+                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(270)">270° B.Inf</button>
+                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(0)">0° B.Temp</button>
+                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(180)">180° B.Nas</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MANDO 5: REÓSTATO DE ILUMINACIÓN DE LA LÁMPARA -->
+            <div class="drum-control fronto-addon-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">5. Reóstato de Bombilla (Brillo):</span>
+                <span id="frontoLampVal" style="font-size: 0.76rem; font-family: monospace; color: #fde047;">100%</span>
+              </div>
+              <div class="slider-row" style="margin-top: 4px;">
+                <span style="font-size: 0.7rem; color: var(--text-muted);">💡 30%</span>
+                <input type="range" id="frontoLampInput" min="30" max="150" step="5" value="100" style="accent-color: #fde047;" oninput="setFrontoLampIntensity(parseInt(this.value, 10))" title="Aumenta el voltaje de la bombilla para lentes de sol oscuras">
+                <span style="font-size: 0.7rem; color: var(--text-muted);">150% 🔆</span>
               </div>
             </div>
 
@@ -2648,7 +2778,7 @@
       shiftY: 0,
       marked: false,
       step: 1,
-      targetType: 'cross', // 'cross' (Americana) o 'dots' (Europea)
+      targetType: 'cross_3x2', // 'cross_3x2' (Reichert/Marco), 'cross_3x3' (Topcon), 'dots' (Europea)
       eyepiecePower: 0, // Calibración de dioptrías del ocular (-3 a +3)
       isMarking: false,
       markingProgress: 0, // Animación de descenso de las 3 agujas (0 a 1)
@@ -2656,6 +2786,14 @@
       tableHeight: 0, // Altura de mesa apoyagafas (0 a 30 mm)
       lensMode: 'unmounted', // 'unmounted', 'frame_od', 'frame_os'
       audioMuted: false,
+      // Prisma Compensador Auxiliar de Risley
+      risleyActive: false,
+      risleyPower: 0, // 0 a 20 Δ
+      risleyBase: 0, // 0° a 360° (Base del prisma)
+      // Filtros ópticos y Bombilla
+      lightFilter: 'green', // 'green' (546 nm mercurio) o 'white' (halógena incandescente)
+      lampIntensity: 1.0, // 0.3 a 1.5
+      tintMode: 'clear', // 'clear', 'g15', 'brown', 'dark'
       isDraggingLens: false,
       dragStartX: 0,
       dragStartY: 0,
@@ -2747,6 +2885,33 @@
         try {
           this.playRatchet(isClamped ? 750 : 1650);
         } catch (e) {}
+      },
+      playRisleyClick() {
+        if (frontoState.audioMuted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          this.playRatchet(1020);
+        } catch (e) {}
+      },
+      playFilterSwitch() {
+        if (frontoState.audioMuted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const t = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(580, t);
+          osc.frequency.exponentialRampToValueAtTime(170, t + 0.04);
+          gain.gain.setValueAtTime(0.12, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.045);
+        } catch (e) {}
       }
     };
 
@@ -2771,18 +2936,111 @@
       4: `<strong>Paso 4: Alinear el Eje (Unir las Líneas Quebradas)</strong><br>
           Si las 3 líneas finas aparecen <em>partidas o quebradas</em> por el prisma de división, significa que el tambor de eje no coincide con el astigmatismo de la lente. Gira el tambor de eje hasta que las líneas se unan en trazos continuos perfectos. El número en el transportador es el <strong>EJE exacto</strong> de la receta.`,
       5: `<strong>Paso 5: Enfocar la Mira Cilíndrica (P2) y Marcar</strong><br>
-          Ahora gira el tambor de potencias hasta enfocar las <strong>3 líneas gruesas perpendiculares</strong>. Anota esta segunda potencia como <strong>P2</strong>.<br>
+          Ahora gira el tambor de potencias hasta enfocar las <strong>2 líneas gruesas</strong> (en el modelo clásico 3x2) o 3 gruesas perpendiculares. Anota esta segunda potencia como <strong>P2</strong>.<br>
           • <strong>Cálculo del Cilindro:</strong> Cil = P2 − P1.<br>
           • Finalmente, pulsa <strong>"Bajar Marcador"</strong> para estampar los <strong>3 puntos</strong> de tinta indeleble (centro óptico y eje horizontal a 180°) para el biselado.`
     };
 
     function setFrontoTargetType(type) {
       frontoState.targetType = type;
-      const bCross = document.getElementById('btnTargetCross');
+      const bCross3x2 = document.getElementById('btnTargetCross3x2');
+      const bCross3x3 = document.getElementById('btnTargetCross3x3');
       const bDots = document.getElementById('btnTargetDots');
-      if (bCross) bCross.classList.toggle('active', type === 'cross');
+      if (bCross3x2) bCross3x2.classList.toggle('active', type === 'cross_3x2');
+      if (bCross3x3) bCross3x3.classList.toggle('active', type === 'cross_3x3');
       if (bDots) bDots.classList.toggle('active', type === 'dots');
       FrontoAudio.playRatchet(1200);
+      drawFrontoCanvas();
+    }
+
+    // Funciones del Prisma Compensador de Risley (0 a 20Δ)
+    function toggleRisleyPrism() {
+      frontoState.risleyActive = !frontoState.risleyActive;
+      const btn = document.getElementById('btnToggleRisley');
+      const area = document.getElementById('risleyControlsArea');
+      if (btn) {
+        if (frontoState.risleyActive) {
+          btn.innerHTML = `🌀 Desacoplar Prisma`;
+          btn.style.background = 'rgba(56, 189, 248, 0.2)';
+          btn.style.color = '#38bdf8';
+          btn.style.borderColor = '#0284c7';
+        } else {
+          btn.innerHTML = `🌀 Acoplar Prisma`;
+          btn.style.background = '#1e293b';
+          btn.style.color = '#38bdf8';
+          btn.style.borderColor = 'var(--border)';
+        }
+      }
+      if (area) {
+        area.style.display = frontoState.risleyActive ? 'flex' : 'none';
+      }
+      FrontoAudio.playClamp(frontoState.risleyActive);
+      drawFrontoCanvas();
+    }
+
+    function setRisleyPower(val) {
+      frontoState.risleyPower = Math.round(Math.max(0, Math.min(20, val)) * 10) / 10;
+      const inp = document.getElementById('risleyPowerInput');
+      const txt = document.getElementById('risleyPowerVal');
+      if (inp) inp.value = frontoState.risleyPower;
+      if (txt) txt.textContent = `${frontoState.risleyPower.toFixed(1)} Δ`;
+      FrontoAudio.playRisleyClick();
+      drawFrontoCanvas();
+    }
+
+    function stepRisleyPower(delta) {
+      setRisleyPower(frontoState.risleyPower + delta);
+    }
+
+    function getBaseLabel(deg) {
+      const d = ((deg % 360) + 360) % 360;
+      if (d >= 45 && d < 135) return "Base Sup";
+      if (d >= 135 && d < 225) return "Base Nasal";
+      if (d >= 225 && d < 315) return "Base Inf";
+      return "Base Temporal";
+    }
+
+    function setRisleyBase(deg) {
+      frontoState.risleyBase = ((deg % 360) + 360) % 360;
+      const inp = document.getElementById('risleyBaseInput');
+      const txt = document.getElementById('risleyBaseVal');
+      if (inp) inp.value = frontoState.risleyBase;
+      if (txt) txt.textContent = `${frontoState.risleyBase}° (${getBaseLabel(frontoState.risleyBase)})`;
+      FrontoAudio.playRisleyClick();
+      drawFrontoCanvas();
+    }
+
+    function stepRisleyBase(delta) {
+      setRisleyBase(frontoState.risleyBase + delta);
+    }
+
+    // Funciones de Filtro de Luz y Reóstato
+    function setFrontoLightFilter(filter) {
+      frontoState.lightFilter = filter;
+      const bGreen = document.getElementById('btnFilterGreen');
+      const bWhite = document.getElementById('btnFilterWhite');
+      if (bGreen) bGreen.classList.toggle('active', filter === 'green');
+      if (bWhite) bWhite.classList.toggle('active', filter === 'white');
+      FrontoAudio.playFilterSwitch();
+      drawFrontoCanvas();
+    }
+
+    function setFrontoLensTint(mode) {
+      frontoState.tintMode = mode;
+      document.getElementById('btnTintClear').classList.toggle('active', mode === 'clear');
+      document.getElementById('btnTintG15').classList.toggle('active', mode === 'g15');
+      document.getElementById('btnTintBrown').classList.toggle('active', mode === 'brown');
+      document.getElementById('btnTintDark').classList.toggle('active', mode === 'dark');
+      FrontoAudio.playGlassSlide();
+      drawFrontoCanvas();
+    }
+
+    function setFrontoLampIntensity(pct) {
+      frontoState.lampIntensity = Math.max(30, Math.min(150, pct)) / 100;
+      const inp = document.getElementById('frontoLampInput');
+      const txt = document.getElementById('frontoLampVal');
+      if (inp) inp.value = pct;
+      if (txt) txt.textContent = `${pct}%`;
       drawFrontoCanvas();
     }
 
@@ -2934,23 +3192,59 @@
       frontoCtx.arc(cx, cy, r, 0, Math.PI * 2);
       frontoCtx.clip();
 
-      // 1. Iluminación óptica espectral (546 nm, Verde Mercurio) con viñeteado y micro-textura
+      // Coordenadas con compensación del Prisma Auxiliar de Risley (0 a 20Δ)
+      let risleyShiftX = 0;
+      let risleyShiftY = 0;
+      if (frontoState.risleyActive && frontoState.risleyPower > 0) {
+        const risleyRad = (frontoState.risleyBase * Math.PI) / 180;
+        // Un prisma compensador desplaza la imagen en sentido opuesto a la base (hacia el vértice)
+        risleyShiftX = frontoState.risleyPower * 4.5 * Math.cos(risleyRad);
+        risleyShiftY = -frontoState.risleyPower * 4.5 * Math.sin(risleyRad);
+      }
+      const targetCenterX = cx + frontoState.shiftX * 4.5 - risleyShiftX;
+      const targetCenterY = cy + frontoState.shiftY * 4.5 - risleyShiftY;
+
+      // Parámetros de tinte de lente de sol y reóstato de lámpara
+      let tintFill = null;
+      let lensTransmission = 1.0;
+      if (frontoState.tintMode === 'g15') {
+        lensTransmission = 0.20;
+        tintFill = 'rgba(28, 48, 30, 0.78)'; // Ray-Ban G-15 verde grisáceo
+      } else if (frontoState.tintMode === 'brown') {
+        lensTransmission = 0.28;
+        tintFill = 'rgba(68, 38, 14, 0.74)'; // Marrón degradé ámbar
+      } else if (frontoState.tintMode === 'dark') {
+        lensTransmission = 0.12;
+        tintFill = 'rgba(15, 19, 26, 0.85)'; // Gris humo Cat. 3
+      }
+
+      const isWhiteLight = frontoState.lightFilter === 'white';
+      const effectiveLum = Math.max(0.12, Math.min(1.8, frontoState.lampIntensity * (frontoState.tintMode === 'clear' ? 1.0 : (0.28 + lensTransmission * 0.72))));
+
+      // 1. Iluminación óptica espectral (546 nm Verde Mercurio vs Luz Halógena Incandescente)
       const bgGrad = frontoCtx.createRadialGradient(cx, cy, 10, cx, cy, r);
-      bgGrad.addColorStop(0, '#156a35');
-      bgGrad.addColorStop(0.5, '#0d4a22');
-      bgGrad.addColorStop(0.82, '#042711');
-      bgGrad.addColorStop(1, '#011206');
+      if (isWhiteLight) {
+        bgGrad.addColorStop(0, `rgba(95, 82, 50, ${0.85 * effectiveLum})`);
+        bgGrad.addColorStop(0.5, `rgba(55, 45, 24, ${0.9 * effectiveLum})`);
+        bgGrad.addColorStop(0.82, `rgba(30, 24, 12, ${0.95 * effectiveLum})`);
+        bgGrad.addColorStop(1, '#090704');
+      } else {
+        bgGrad.addColorStop(0, `rgba(21, 106, 53, ${0.9 * effectiveLum})`);
+        bgGrad.addColorStop(0.5, `rgba(13, 74, 34, ${0.95 * effectiveLum})`);
+        bgGrad.addColorStop(0.82, `rgba(4, 39, 17, ${0.98 * effectiveLum})`);
+        bgGrad.addColorStop(1, '#011206');
+      }
       frontoCtx.fillStyle = bgGrad;
       frontoCtx.fillRect(0, 0, w, h);
 
       // Micro-anillos de difracción de las lentes del colimador
-      frontoCtx.strokeStyle = "rgba(56, 189, 248, 0.08)";
+      frontoCtx.strokeStyle = isWhiteLight ? "rgba(254, 240, 138, 0.08)" : "rgba(56, 189, 248, 0.08)";
       frontoCtx.lineWidth = 1.5;
       frontoCtx.beginPath();
       frontoCtx.arc(cx, cy, r * 0.88, 0, Math.PI * 2);
       frontoCtx.stroke();
 
-      frontoCtx.strokeStyle = "rgba(167, 243, 208, 0.06)";
+      frontoCtx.strokeStyle = isWhiteLight ? "rgba(253, 224, 71, 0.06)" : "rgba(167, 243, 208, 0.06)";
       frontoCtx.lineWidth = 2;
       frontoCtx.beginPath();
       frontoCtx.arc(cx, cy, r * 0.72, 0, Math.PI * 2);
@@ -2971,9 +3265,9 @@
       frontoCtx.stroke();
       frontoCtx.restore();
 
-      // Coordenadas del centro óptico de la lente
-      const targetCenterX = cx + frontoState.shiftX * 4.5;
-      const targetCenterY = cy + frontoState.shiftY * 4.5;
+      // Coordenadas físicas del cristal
+      const physicalLensX = cx + frontoState.shiftX * 4.5;
+      const physicalLensY = cy + frontoState.shiftY * 4.5;
 
       // 3. Regla apoyagafas móvil (Lens Table)
       const tableVisualY = cy + r * 0.55 - frontoState.tableHeight * 2.2;
@@ -2989,28 +3283,36 @@
       frontoCtx.fillRect(cx - r * 0.85, tableVisualY, r * 1.7, 5);
       frontoCtx.restore();
 
-      // 4. Silueta de la Lente: Lente en Bruto vs. Gafa Montada (OD / OI)
+      // 4. Silueta de la Lente: Lente en Bruto vs. Gafa Montada (OD / OI) con Tinte Solar
       frontoCtx.save();
       if (frontoState.lensMode === 'unmounted') {
         // A) LENTE SUELTA EN BRUTO (Disco redondo con bisel y AR)
         const lensR = r * 0.95;
-        const glassGrad = frontoCtx.createRadialGradient(targetCenterX, targetCenterY, 15, targetCenterX, targetCenterY, lensR);
+        const glassGrad = frontoCtx.createRadialGradient(physicalLensX, physicalLensY, 15, physicalLensX, physicalLensY, lensR);
         glassGrad.addColorStop(0, 'rgba(240, 253, 244, 0.03)');
         glassGrad.addColorStop(0.8, 'rgba(187, 247, 208, 0.05)');
         glassGrad.addColorStop(1, 'rgba(56, 189, 248, 0.09)');
         frontoCtx.fillStyle = glassGrad;
         frontoCtx.beginPath();
-        frontoCtx.arc(targetCenterX, targetCenterY, lensR, 0, Math.PI * 2);
+        frontoCtx.arc(physicalLensX, physicalLensY, lensR, 0, Math.PI * 2);
         frontoCtx.fill();
 
+        // Tinte de Lente de Sol (si aplica)
+        if (tintFill) {
+          frontoCtx.fillStyle = tintFill;
+          frontoCtx.beginPath();
+          frontoCtx.arc(physicalLensX, physicalLensY, lensR, 0, Math.PI * 2);
+          frontoCtx.fill();
+        }
+
         // Borde del bisel
-        frontoCtx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+        frontoCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
         frontoCtx.lineWidth = 2.5;
         frontoCtx.stroke();
         frontoCtx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
         frontoCtx.lineWidth = 1;
         frontoCtx.beginPath();
-        frontoCtx.arc(targetCenterX, targetCenterY, lensR - 3, 0, Math.PI * 2);
+        frontoCtx.arc(physicalLensX, physicalLensY, lensR - 3, 0, Math.PI * 2);
         frontoCtx.stroke();
       } else {
         // B) GAFA COMPLETA MONTADA (Armazón con aro, puente y bisagra)
@@ -3019,10 +3321,10 @@
         const frameH = r * 0.72;
 
         frontoCtx.save();
-        frontoCtx.translate(targetCenterX, targetCenterY);
+        frontoCtx.translate(physicalLensX, physicalLensY);
 
         // Vidrio montado en bisel
-        frontoCtx.fillStyle = 'rgba(220, 252, 231, 0.05)';
+        frontoCtx.fillStyle = tintFill || 'rgba(220, 252, 231, 0.05)';
         frontoCtx.beginPath();
         frontoCtx.roundRect(-frameW, -frameH, frameW * 2, frameH * 2, [35, 35, 28, 28]);
         frontoCtx.fill();
@@ -3040,7 +3342,6 @@
         frontoCtx.strokeStyle = '#334155';
         frontoCtx.lineWidth = 5;
         frontoCtx.beginPath();
-        // Puente hacia la nariz
         frontoCtx.moveTo(nasalSide * frameW, -frameH * 0.1);
         frontoCtx.quadraticCurveTo(nasalSide * (frameW + 24), -frameH * 0.25, nasalSide * (frameW + 42), -frameH * 0.1);
         frontoCtx.stroke();
@@ -3050,7 +3351,7 @@
         frontoCtx.fillRect(-nasalSide * (frameW + 6), -frameH * 0.5, 7, 14);
 
         // Indicador de Ojo
-        frontoCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
+        frontoCtx.fillStyle = "rgba(255, 255, 255, 0.5)";
         frontoCtx.font = '900 11px system-ui';
         frontoCtx.textAlign = 'center';
         frontoCtx.fillText(isOD ? "OD (DERECHO)" : "OI (IZQUIERDO)", 0, frameH - 12);
@@ -3064,24 +3365,23 @@
       // 5. Reflejos Parásitos de Purkinje (Reflejos fantasma curvados de las caras de la lente)
       frontoCtx.save();
       const ghostOffset = (frontoState.shiftX * 1.5);
-      frontoCtx.strokeStyle = "rgba(134, 239, 172, 0.14)";
+      frontoCtx.strokeStyle = isWhiteLight ? "rgba(254, 240, 138, 0.14)" : "rgba(134, 239, 172, 0.14)";
       frontoCtx.lineWidth = 2.5;
       frontoCtx.beginPath();
       // Reflejo cara anterior (convexo)
-      frontoCtx.arc(targetCenterX - 18 + ghostOffset, targetCenterY - 24, 42, Math.PI * 0.9, Math.PI * 1.4);
+      frontoCtx.arc(physicalLensX - 18 + ghostOffset, physicalLensY - 24, 42, Math.PI * 0.9, Math.PI * 1.4);
       frontoCtx.stroke();
 
       // Reflejo cara posterior (cóncavo)
-      frontoCtx.strokeStyle = "rgba(56, 189, 248, 0.12)";
+      frontoCtx.strokeStyle = isWhiteLight ? "rgba(253, 224, 71, 0.12)" : "rgba(56, 189, 248, 0.12)";
       frontoCtx.beginPath();
-      frontoCtx.arc(targetCenterX + 16 - ghostOffset, targetCenterY + 22, 54, Math.PI * 1.9, Math.PI * 2.35);
+      frontoCtx.arc(physicalLensX + 16 - ghostOffset, physicalLensY + 22, 54, Math.PI * 1.9, Math.PI * 2.35);
       frontoCtx.stroke();
       frontoCtx.restore();
 
       // 6. Pinza de sujeción prensora mecánica (si está bajada)
       if (frontoState.clamped) {
         frontoCtx.save();
-        // Brazo metálico de la pinza desde la izquierda
         frontoCtx.strokeStyle = "rgba(71, 85, 105, 0.8)";
         frontoCtx.lineWidth = 7;
         frontoCtx.beginPath();
@@ -3113,7 +3413,8 @@
       }
       const prismEl = document.getElementById('frontoPrismTxt');
       if (prismEl) {
-        prismEl.textContent = `Prisma: ${inducedPrism.toFixed(2)} Δ${baseText}`;
+        let risleyNote = frontoState.risleyActive && frontoState.risleyPower > 0 ? ` | Risley: ${frontoState.risleyPower.toFixed(1)}Δ` : "";
+        prismEl.textContent = `Prisma: ${inducedPrism.toFixed(2)} Δ${baseText}${risleyNote}`;
       }
 
       // 8. Cálculos ópticos de enfoque
@@ -3130,25 +3431,54 @@
       const isSplit = Math.abs(state.cyl) > 0.1 && axisDiff > 1;
       const splitOffset = isSplit ? Math.min(24, axisDiff * 0.75 * Math.min(2, Math.abs(state.cyl) + 0.4)) : 0;
 
-      // 9. PROYECCIÓN DE LAS MIRAS CON LUMINANCE PEAKING (BRILLO FOCO EXACTO)
-      if (frontoState.targetType === 'cross') {
-        // ================= MIRA AMERICANA (CRUZ DE LÍNEAS) =================
+      // 9. PROYECCIÓN DE LAS MIRAS CON LUMINANCE PEAKING Y DESENFOQUE RECÍPROCO
+      if (frontoState.targetType.startsWith('cross')) {
+        const is3x2 = frontoState.targetType === 'cross_3x2';
         const blurM1 = Math.min(25, d1 * 4.2);
         const blurM2 = Math.min(25, d2 * 4.2);
 
+        const isP1Sharp = d1 < 0.15;
+        const isP2Sharp = d2 < 0.15;
+
         // A) MIRA ESFÉRICA (3 líneas finas) con Luminance Peaking
         frontoCtx.save();
-        const isP1Sharp = d1 < 0.15;
-        const alpha1 = isP1Sharp ? 1.0 : Math.max(0.12, 1 - d1 * 0.18);
+        const alpha1 = isP1Sharp ? 1.0 * effectiveLum : Math.max(0.08, (1 - d1 * 0.20) * effectiveLum);
         frontoCtx.globalAlpha = alpha1;
-        frontoCtx.strokeStyle = isP1Sharp ? "#ffffff" : "#4ade80";
-        frontoCtx.shadowColor = isP1Sharp ? "#4ade80" : "#22c55e";
-        frontoCtx.shadowBlur = isP1Sharp ? 14 : (blurM1 > 0.4 ? blurM1 * 2 + 3 : 5);
-        frontoCtx.lineWidth = isP1Sharp ? 2.5 : (blurM1 > 0.4 ? Math.max(1.2, 2.2 + blurM1 * 0.4) : 2.2);
 
-        [-13, 0, 13].forEach(off => {
+        const stroke1 = isP1Sharp ? "#ffffff" : (isWhiteLight ? "#fef08a" : "#4ade80");
+        const glow1 = isP1Sharp ? (isWhiteLight ? "#fde047" : "#4ade80") : (isWhiteLight ? "#eab308" : "#22c55e");
+        frontoCtx.strokeStyle = stroke1;
+        frontoCtx.shadowColor = glow1;
+        frontoCtx.shadowBlur = isP1Sharp ? 15 : (blurM1 > 0.4 ? blurM1 * 2 + 3 : 5);
+        frontoCtx.lineWidth = isP1Sharp ? 2.4 : (blurM1 > 0.4 ? Math.max(1.2, 2.0 + blurM1 * 0.4) : 2.0);
+
+        const sphOffsets = is3x2 ? [-12, 0, 12] : [-13, 0, 13];
+        sphOffsets.forEach(off => {
           const perpX = off * Math.cos(frontoRad + Math.PI / 2);
           const perpY = -off * Math.sin(frontoRad + Math.PI / 2);
+
+          // Flecos de dispersión cromática bajo luz halógena incandescente
+          if (isWhiteLight && (shiftMm > 0.6 || Math.abs(state.cyl) > 0.25)) {
+            const dispOff = Math.min(3.2, 1.0 + shiftMm * 0.25);
+            const dxR = dispOff * Math.cos(frontoRad + Math.PI / 2);
+            const dyR = -dispOff * Math.sin(frontoRad + Math.PI / 2);
+
+            frontoCtx.save();
+            frontoCtx.strokeStyle = "rgba(239, 68, 68, 0.45)";
+            frontoCtx.lineWidth = frontoCtx.lineWidth * 0.85;
+            frontoCtx.shadowBlur = 0;
+            frontoCtx.beginPath();
+            frontoCtx.moveTo(targetCenterX + perpX + dxR - r * 0.75 * Math.cos(frontoRad), targetCenterY + perpY + dyR + r * 0.75 * Math.sin(frontoRad));
+            frontoCtx.lineTo(targetCenterX + perpX + dxR + r * 0.75 * Math.cos(frontoRad), targetCenterY + perpY + dyR - r * 0.75 * Math.sin(frontoRad));
+            frontoCtx.stroke();
+
+            frontoCtx.strokeStyle = "rgba(59, 130, 246, 0.45)";
+            frontoCtx.beginPath();
+            frontoCtx.moveTo(targetCenterX + perpX - dxR - r * 0.75 * Math.cos(frontoRad), targetCenterY + perpY - dyR + r * 0.75 * Math.sin(frontoRad));
+            frontoCtx.lineTo(targetCenterX + perpX - dxR + r * 0.75 * Math.cos(frontoRad), targetCenterY + perpY - dyR - r * 0.75 * Math.sin(frontoRad));
+            frontoCtx.stroke();
+            frontoCtx.restore();
+          }
 
           if (isSplit) {
             // Mitad superior desfasada por Inouye
@@ -3190,19 +3520,44 @@
         });
         frontoCtx.restore();
 
-        // B) MIRA CILÍNDRICA (3 líneas gruesas) con Luminance Peaking
+        // B) MIRA CILÍNDRICA (2 barras gruesas para 3x2, o 3 gruesas para 3x3)
         frontoCtx.save();
-        const isP2Sharp = d2 < 0.15;
-        const alpha2 = isP2Sharp ? 1.0 : Math.max(0.12, 1 - d2 * 0.18);
+        const alpha2 = isP2Sharp ? 1.0 * effectiveLum : Math.max(0.08, (1 - d2 * 0.20) * effectiveLum);
         frontoCtx.globalAlpha = alpha2;
-        frontoCtx.strokeStyle = isP2Sharp ? "#ffffff" : "#86efac";
-        frontoCtx.shadowColor = isP2Sharp ? "#4ade80" : "#22c55e";
-        frontoCtx.shadowBlur = isP2Sharp ? 16 : (blurM2 > 0.4 ? blurM2 * 2 + 4 : 6);
-        frontoCtx.lineWidth = isP2Sharp ? 6.5 : (blurM2 > 0.4 ? Math.max(2.5, 6.0 + blurM2 * 0.5) : 6.0);
 
-        [-18, 0, 18].forEach(off => {
+        const stroke2 = isP2Sharp ? "#ffffff" : (isWhiteLight ? "#fef08a" : "#86efac");
+        const glow2 = isP2Sharp ? (isWhiteLight ? "#fde047" : "#4ade80") : (isWhiteLight ? "#eab308" : "#22c55e");
+        frontoCtx.strokeStyle = stroke2;
+        frontoCtx.shadowColor = glow2;
+        frontoCtx.shadowBlur = isP2Sharp ? 16 : (blurM2 > 0.4 ? blurM2 * 2 + 4 : 6);
+        frontoCtx.lineWidth = isP2Sharp ? (is3x2 ? 6.5 : 6.0) : (blurM2 > 0.4 ? Math.max(2.5, 5.8 + blurM2 * 0.5) : 5.8);
+
+        const cylOffsets = is3x2 ? [-15, 15] : [-18, 0, 18];
+        cylOffsets.forEach(off => {
           const perpX = off * Math.cos(frontoRad2 + Math.PI / 2);
           const perpY = -off * Math.sin(frontoRad2 + Math.PI / 2);
+
+          if (isWhiteLight && (shiftMm > 0.6 || Math.abs(state.cyl) > 0.25)) {
+            const dispOff = Math.min(3.2, 1.0 + shiftMm * 0.25);
+            const dxR = dispOff * Math.cos(frontoRad2 + Math.PI / 2);
+            const dyR = -dispOff * Math.sin(frontoRad2 + Math.PI / 2);
+
+            frontoCtx.save();
+            frontoCtx.strokeStyle = "rgba(239, 68, 68, 0.45)";
+            frontoCtx.lineWidth = frontoCtx.lineWidth * 0.85;
+            frontoCtx.shadowBlur = 0;
+            frontoCtx.beginPath();
+            frontoCtx.moveTo(targetCenterX + perpX + dxR - r * 0.75 * Math.cos(frontoRad2), targetCenterY + perpY + dyR + r * 0.75 * Math.sin(frontoRad2));
+            frontoCtx.lineTo(targetCenterX + perpX + dxR + r * 0.75 * Math.cos(frontoRad2), targetCenterY + perpY + dyR - r * 0.75 * Math.sin(frontoRad2));
+            frontoCtx.stroke();
+
+            frontoCtx.strokeStyle = "rgba(59, 130, 246, 0.45)";
+            frontoCtx.beginPath();
+            frontoCtx.moveTo(targetCenterX + perpX - dxR - r * 0.75 * Math.cos(frontoRad2), targetCenterY + perpY - dyR + r * 0.75 * Math.sin(frontoRad2));
+            frontoCtx.lineTo(targetCenterX + perpX - dxR + r * 0.75 * Math.cos(frontoRad2), targetCenterY + perpY - dyR - r * 0.75 * Math.sin(frontoRad2));
+            frontoCtx.stroke();
+            frontoCtx.restore();
+          }
 
           frontoCtx.beginPath();
           frontoCtx.moveTo(
@@ -3221,10 +3576,10 @@
         if (isP1Sharp && isP2Sharp) {
           frontoCtx.save();
           frontoCtx.fillStyle = "#ffffff";
-          frontoCtx.shadowColor = "#4ade80";
+          frontoCtx.shadowColor = isWhiteLight ? "#fde047" : "#4ade80";
           frontoCtx.shadowBlur = 20;
           frontoCtx.beginPath();
-          frontoCtx.arc(targetCenterX, targetCenterY, 6, 0, Math.PI * 2);
+          frontoCtx.arc(targetCenterX, targetCenterY, 6.5, 0, Math.PI * 2);
           frontoCtx.fill();
           frontoCtx.restore();
         }
@@ -3245,7 +3600,7 @@
           const diffTheta = Math.abs(drum - powerTheta);
 
           const dotBlur = Math.min(20, diffTheta * 4.5);
-          const dotAlpha = Math.max(0.2, 1 - diffTheta * 0.22);
+          const dotAlpha = Math.max(0.12, (1 - diffTheta * 0.22) * effectiveLum);
           const isPointSharp = diffTheta < 0.15;
 
           frontoCtx.save();
@@ -3257,8 +3612,8 @@
 
           frontoCtx.beginPath();
           frontoCtx.ellipse(0, 0, radX, radY, 0, 0, Math.PI * 2);
-          frontoCtx.fillStyle = isPointSharp ? "rgba(255, 255, 255, 0.95)" : `rgba(134, 239, 172, ${dotAlpha})`;
-          frontoCtx.shadowColor = "#4ade80";
+          frontoCtx.fillStyle = isPointSharp ? "rgba(255, 255, 255, 0.95)" : (isWhiteLight ? `rgba(254, 240, 138, ${dotAlpha})` : `rgba(134, 239, 172, ${dotAlpha})`);
+          frontoCtx.shadowColor = isWhiteLight ? "#fde047" : "#4ade80";
           frontoCtx.shadowBlur = isPointSharp ? 12 : (dotBlur > 0.5 ? dotBlur * 1.8 + 2 : 4);
           frontoCtx.fill();
           frontoCtx.restore();
@@ -3273,6 +3628,21 @@
         frontoCtx.filter = `blur(${eyBlur.toFixed(1)}px)`;
         frontoCtx.globalAlpha = Math.max(0.35, 1 - eyBlur * 0.15);
       }
+
+      // Micropartículas de polvo estáticas sobre la placa de cristal de la retícula (textura analógica)
+      const dustPoints = [
+        { x: cx + r * 0.35, y: cy - r * 0.42, rad: 1.2, a: 0.38 },
+        { x: cx - r * 0.48, y: cy + r * 0.25, rad: 1.0, a: 0.30 },
+        { x: cx + r * 0.16, y: cy + r * 0.65, rad: 1.5, a: 0.36 },
+        { x: cx - r * 0.22, y: cy - r * 0.55, rad: 0.8, a: 0.28 },
+        { x: cx + r * 0.62, y: cy + r * 0.18, rad: 1.3, a: 0.26 }
+      ];
+      dustPoints.forEach(pt => {
+        frontoCtx.fillStyle = `rgba(15, 23, 42, ${pt.a})`;
+        frontoCtx.beginPath();
+        frontoCtx.arc(pt.x, pt.y, pt.rad, 0, Math.PI * 2);
+        frontoCtx.fill();
+      });
 
       const reticleColor = "rgba(10, 15, 29, 0.88)";
       frontoCtx.strokeStyle = reticleColor;
@@ -3385,6 +3755,35 @@
 
       frontoCtx.restore(); // Fin retícula
 
+      // Bisel y Escala del Prisma Auxiliar de Risley (si está acoplado)
+      if (frontoState.risleyActive) {
+        frontoCtx.save();
+        const risleyRingR = r * 0.94;
+        frontoCtx.strokeStyle = "rgba(56, 189, 248, 0.45)";
+        frontoCtx.lineWidth = 3;
+        frontoCtx.beginPath();
+        frontoCtx.arc(cx, cy, risleyRingR, 0, Math.PI * 2);
+        frontoCtx.stroke();
+
+        // Marcador de flecha de la Base del Prisma de Risley
+        const baseRad = (frontoState.risleyBase * Math.PI) / 180;
+        const markerX = cx + risleyRingR * Math.cos(baseRad);
+        const markerY = cy - risleyRingR * Math.sin(baseRad);
+        frontoCtx.fillStyle = "#38bdf8";
+        frontoCtx.shadowColor = "#0284c7";
+        frontoCtx.shadowBlur = 8;
+        frontoCtx.beginPath();
+        frontoCtx.arc(markerX, markerY, 5.5, 0, Math.PI * 2);
+        frontoCtx.fill();
+
+        // Texto indicador de Risley en el cuadrante inferior
+        frontoCtx.font = 'bold 10px monospace';
+        frontoCtx.fillStyle = "rgba(56, 189, 248, 0.95)";
+        frontoCtx.textAlign = 'center';
+        frontoCtx.fillText(`PRISMA RISLEY: ${frontoState.risleyPower.toFixed(1)}Δ @ ${frontoState.risleyBase}°`, cx, cy + r * 0.86);
+        frontoCtx.restore();
+      }
+
       // 11. PUNTOS DE TINTA MARCADOS EN LA LENTE
       if (frontoState.marked) {
         frontoCtx.save();
@@ -3392,8 +3791,8 @@
         const markAngle = frontoRad;
 
         [-46, 0, 46].forEach(dOffset => {
-          const dotX = targetCenterX + dOffset * Math.cos(markAngle);
-          const dotY = targetCenterY - dOffset * Math.sin(markAngle);
+          const dotX = physicalLensX + dOffset * Math.cos(markAngle);
+          const dotY = physicalLensY - dOffset * Math.sin(markAngle);
 
           frontoCtx.beginPath();
           frontoCtx.arc(dotX, dotY, dotR + 1, 0, Math.PI * 2);
@@ -3616,7 +4015,7 @@
         alertBox.style.borderColor = "var(--cmd-color)";
         alertBox.style.color = "#fde047";
         alertBox.innerHTML = `⚠️ <strong>Paso 2 (Lente descentrada):</strong> El centro óptico está desplazado. Arrastra la lente o pulsa <em>"Centrar Lente"</em> para eliminar el prisma. Luego baja la pinza.`;
-      } else if (isSplit && frontoState.targetType === 'cross') {
+      } else if (isSplit && frontoState.targetType.startsWith('cross')) {
         alertBox.style.background = "rgba(244, 63, 94, 0.18)";
         alertBox.style.borderColor = "var(--m2-color)";
         alertBox.style.color = "#fda4af";
@@ -3663,8 +4062,8 @@
       const valEl = document.getElementById('frontoDrumVal');
       if (valEl) valEl.textContent = formatDiopter(frontoState.power);
       
-      drawFrontoCanvas();
       drawFrontoDrumCanvas();
+      drawFrontoCanvas();
     }
 
     function stepFrontoDrum(delta) {
@@ -3743,6 +4142,13 @@
       frontoState.clamped = false;
       frontoState.tableHeight = 0;
       frontoState.lensMode = 'unmounted';
+
+      if (frontoState.risleyActive) toggleRisleyPrism();
+      setRisleyPower(0);
+      setRisleyBase(0);
+      setFrontoLightFilter('green');
+      setFrontoLensTint('clear');
+      setFrontoLampIntensity(100);
 
       const btnClamp = document.getElementById('btnClampToggle');
       if (btnClamp) {
