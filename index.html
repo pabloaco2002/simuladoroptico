@@ -1148,12 +1148,38 @@
       background: #0b121e;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 12px 14px;
       margin-top: 8px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       font-size: 0.82rem;
+    }
+
+    .blind-audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.76rem;
+      margin-top: 6px;
+    }
+
+    .blind-audit-table th {
+      background: rgba(255, 255, 255, 0.05);
+      color: #94a3b8;
+      text-align: left;
+      padding: 5px 8px;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .blind-audit-table td {
+      padding: 5px 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+    }
+
+    .blind-audit-table tr:last-child td {
+      border-bottom: none;
     }
 
     /* VISTA: MODO QUIZ */
@@ -2264,20 +2290,75 @@
                 </div>
               </div>
 
-              <!-- Panel Interactivo de Modo Taller a Ciegas (Examen) -->
+              <!-- Panel Interactivo de Modo Taller a Ciegas (Examen de 2 Lecturas) -->
               <div id="frontoBlindArea" style="display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <div style="font-size: 0.82rem; color: #cbd5e1; margin-bottom: 8px;">
-                  Tu lectura actual en los tambores: <strong id="blindMyReadTxt" style="color: #38bdf8; font-family: monospace;">-2.50 D a 45°</strong>
+                <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 10px; line-height: 1.4;">
+                  Realiza las dos lecturas focales en los tambores para deducir la fórmula completa de la lente incógnita:
                 </div>
+
+                <!-- PASO 1: LECTURA 1 (P1 y EJE) -->
+                <div class="blind-reading-card" id="cardBlindP1" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #38bdf8;">1ª Lectura (Esfera P1 y Eje):</span>
+                    <span id="badgeBlindP1" style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); font-weight: 600;">⏳ Pendiente</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <div style="font-size: 0.8rem; color: #cbd5e1;">
+                      Valor capturado: <strong id="valBlindP1Txt" style="color: #38bdf8; font-family: monospace;">--- D a ---°</strong>
+                    </div>
+                    <button class="step-btn" id="btnRecordP1" style="width: auto; padding: 5px 11px; font-size: 0.76rem; background: #0284c7; color: #fff; font-weight: 700;" onclick="recordBlindReading1()">
+                      📌 Tomar 1ª Lectura
+                    </button>
+                  </div>
+                </div>
+
+                <!-- PASO 2: LECTURA 2 (P2) -->
+                <div class="blind-reading-card" id="cardBlindP2" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.8rem; font-weight: 700; color: #f43f5e;">2ª Lectura (2º Meridiano P2):</span>
+                    <span id="badgeBlindP2" style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); font-weight: 600;">⏳ Pendiente</span>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <div style="font-size: 0.8rem; color: #cbd5e1;">
+                      Valor capturado: <strong id="valBlindP2Txt" style="color: #f43f5e; font-family: monospace;">--- D</strong>
+                    </div>
+                    <button class="step-btn" id="btnRecordP2" style="width: auto; padding: 5px 11px; font-size: 0.76rem; background: #be123c; color: #fff; font-weight: 700;" onclick="recordBlindReading2()">
+                      📌 Tomar 2ª Lectura
+                    </button>
+                  </div>
+                </div>
+
+                <!-- PASO 3: FÓRMULA DEDUCIDA POR EL ALUMNO -->
+                <div id="blindDeducedBox" style="display: none; background: #070d17; border: 1px solid #1e293b; border-radius: 8px; padding: 9px 12px; margin-bottom: 10px;">
+                  <div style="font-size: 0.74rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Fórmula Deducida por tus Lecturas:</div>
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8rem; color: #cbd5e1;">
+                    <div>Esfera (P1): <strong id="deducedSphTxt" style="color: #38bdf8;">--</strong></div>
+                    <div>Cilindro (P2 − P1): <strong id="deducedCylTxt" style="color: #fbbf24;">--</strong></div>
+                  </div>
+                  <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.84rem;">
+                    Receta obtenida: <code id="deducedRecipeTxt" style="font-size: 0.95rem; color: #4ade80; font-weight: 800;">---</code>
+                  </div>
+                </div>
+
+                <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 8px;">
+                  Lectura actual en tambores: <strong id="blindMyReadTxt" style="color: #38bdf8; font-family: monospace;">0.00 D a 0°</strong>
+                </div>
+
+                <!-- ACCIONES DE EXAMEN -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <button class="step-btn" style="flex: 1; padding: 7px 12px; font-size: 0.8rem; background: #0284c7; color: #fff; font-weight: 700;" onclick="checkBlindMeasurement()">
-                    🎯 Comprobar Medición
+                  <button class="step-btn" id="btnGradeBlindExam" style="flex: 1; padding: 8px 12px; font-size: 0.82rem; background: #0284c7; color: #fff; font-weight: 800;" onclick="checkBlindMeasurement()">
+                    🎯 Calificar Examen Completo
                   </button>
-                  <button class="step-btn" style="width: auto; padding: 7px 12px; font-size: 0.8rem;" onclick="generateNewBlindLens()">
+                  <button class="step-btn" style="width: auto; padding: 8px 12px; font-size: 0.82rem;" onclick="resetBlindExamReadings()" title="Borrar lecturas tomadas y repetir medición en esta misma lente">
+                    🔄 Reiniciar Lecturas
+                  </button>
+                  <button class="step-btn" style="width: auto; padding: 8px 12px; font-size: 0.82rem;" onclick="generateNewBlindLens()" title="Cargar otra lente incógnita de prueba">
                     🎲 Nueva Lente
                   </button>
                 </div>
-                <div id="blindResultBox" style="display: none; margin-top: 8px;" class="blind-eval-box"></div>
+
+                <!-- AUDITORÍA DE RESULTADOS SEGÚN ISO 8598 -->
+                <div id="blindResultBox" style="display: none; margin-top: 10px;" class="blind-eval-box"></div>
               </div>
             </div>
 
@@ -3080,6 +3161,12 @@
       drumDragStartPower: 0,
       practiceMode: 'demo', // 'demo' o 'blind'
       blindLens: null, // { sph, cyl, axis }
+      blindExam: {
+        p1: null,
+        axis1: null,
+        p2: null,
+        prism: 0
+      },
       isDraggingAxis: false
     };
 
@@ -3331,6 +3418,119 @@
       FrontoAudio.playRatchet(1400);
     }
 
+    // --- MODO EXAMEN DE TALLER: FLUJO DE 2 LECTURAS (P1 y P2) SEGÚN ISO 8598 ---
+
+    // 1ª Lectura: Registrar Esfera (P1) y Eje
+    function recordBlindReading1() {
+      if (!frontoState.blindLens) return;
+      const prism = Math.sqrt(frontoState.shiftX * frontoState.shiftX + frontoState.shiftY * frontoState.shiftY) * 0.38;
+      frontoState.blindExam.p1 = frontoState.power;
+      frontoState.blindExam.axis1 = frontoState.axis;
+      frontoState.blindExam.prism = prism;
+
+      const badge = document.getElementById('badgeBlindP1');
+      const valTxt = document.getElementById('valBlindP1Txt');
+      if (badge) {
+        badge.textContent = "✅ Registrada";
+        badge.style.background = "rgba(34, 197, 94, 0.2)";
+        badge.style.color = "#4ade80";
+        badge.style.borderColor = "#22c55e";
+      }
+      if (valTxt) {
+        valTxt.textContent = `${formatDiopter(frontoState.power)} D a ${frontoState.axis}°`;
+      }
+
+      updateBlindDeducedFormula();
+      FrontoAudio.playRatchet(1850);
+      drawFrontoCanvas();
+    }
+
+    // 2ª Lectura: Registrar 2º Meridiano Focal (P2: Cilindro)
+    function recordBlindReading2() {
+      if (!frontoState.blindLens) return;
+      frontoState.blindExam.p2 = frontoState.power;
+
+      const badge = document.getElementById('badgeBlindP2');
+      const valTxt = document.getElementById('valBlindP2Txt');
+      if (badge) {
+        badge.textContent = "✅ Registrada";
+        badge.style.background = "rgba(34, 197, 94, 0.2)";
+        badge.style.color = "#4ade80";
+        badge.style.borderColor = "#22c55e";
+      }
+      if (valTxt) {
+        valTxt.textContent = `${formatDiopter(frontoState.power)} D`;
+      }
+
+      updateBlindDeducedFormula();
+      FrontoAudio.playRatchet(1850);
+      drawFrontoCanvas();
+    }
+
+    // Actualizar la tarjeta con la fórmula deducida por el alumno a partir de P1 y P2
+    function updateBlindDeducedFormula() {
+      const box = document.getElementById('blindDeducedBox');
+      const sphTxt = document.getElementById('deducedSphTxt');
+      const cylTxt = document.getElementById('deducedCylTxt');
+      const recTxt = document.getElementById('deducedRecipeTxt');
+      if (!box) return;
+
+      const p1 = frontoState.blindExam.p1;
+      const p2 = frontoState.blindExam.p2;
+      const ax = frontoState.blindExam.axis1 !== null ? frontoState.blindExam.axis1 : 0;
+
+      if (p1 !== null && p2 !== null) {
+        box.style.display = 'block';
+        const cyl = Math.round((p2 - p1) * 100) / 100;
+        if (sphTxt) sphTxt.textContent = formatDiopter(p1);
+        if (cylTxt) cylTxt.textContent = formatDiopter(cyl);
+        if (recTxt) recTxt.textContent = formatRecipe(p1, cyl, ax);
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    // Reiniciar lecturas del examen para la misma lente incógnita
+    function resetBlindExamReadings() {
+      frontoState.blindExam = {
+        p1: null,
+        axis1: null,
+        p2: null,
+        prism: 0
+      };
+
+      const bP1 = document.getElementById('badgeBlindP1');
+      const vP1 = document.getElementById('valBlindP1Txt');
+      if (bP1) {
+        bP1.textContent = "⏳ Pendiente";
+        bP1.style.background = "rgba(234, 179, 8, 0.15)";
+        bP1.style.color = "#fde047";
+        bP1.style.borderColor = "rgba(234, 179, 8, 0.3)";
+      }
+      if (vP1) vP1.textContent = "--- D a ---°";
+
+      const bP2 = document.getElementById('badgeBlindP2');
+      const vP2 = document.getElementById('valBlindP2Txt');
+      if (bP2) {
+        bP2.textContent = "⏳ Pendiente";
+        bP2.style.background = "rgba(234, 179, 8, 0.15)";
+        bP2.style.color = "#fde047";
+        bP2.style.borderColor = "rgba(234, 179, 8, 0.3)";
+      }
+      if (vP2) vP2.textContent = "--- D";
+
+      updateBlindDeducedFormula();
+
+      const resBox = document.getElementById('blindResultBox');
+      if (resBox) {
+        resBox.style.display = 'none';
+        resBox.innerHTML = '';
+      }
+
+      FrontoAudio.playRatchet(1200);
+      drawFrontoCanvas();
+    }
+
     // Generar nueva lente incógnita de taller para modo examen a ciegas
     function generateNewBlindLens() {
       const sphs = [-5.0, -4.5, -4.0, -3.75, -3.5, -3.0, -2.75, -2.5, -2.25, -2.0, -1.75, -1.5, -1.25, -1.0, -0.75, -0.5, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0];
@@ -3342,6 +3542,7 @@
       const a = axes[Math.floor(Math.random() * axes.length)];
 
       frontoState.blindLens = { sph: s, cyl: c, axis: a };
+      resetBlindExamReadings();
 
       // Resetear posición de lente y tambor para que el usuario mida desde cero
       frontoState.power = 0;
@@ -3351,35 +3552,55 @@
       frontoState.marked = false;
       if (frontoState.clamped) toggleFrontoClamp();
 
-      const resBox = document.getElementById('blindResultBox');
-      if (resBox) {
-        resBox.style.display = 'none';
-        resBox.innerHTML = '';
-      }
-
       setFrontoDrum(0);
       setFrontoAxis(0);
       drawFrontoCanvas();
       FrontoAudio.playRatchet(1600);
     }
 
-    // Comprobar la medición del alumno en modo examen de taller según ISO 8598
+    // Calificar el examen de 2 lecturas del alumno según norma ISO 8598 e ISO 21987
     function checkBlindMeasurement() {
       if (!frontoState.blindLens) return;
       const resBox = document.getElementById('blindResultBox');
       if (!resBox) return;
 
+      const p1User = frontoState.blindExam.p1;
+      const axUser = frontoState.blindExam.axis1;
+      const p2User = frontoState.blindExam.p2;
+
+      // Validar si ambas lecturas han sido capturadas
+      if (p1User === null || p2User === null) {
+        resBox.style.display = 'flex';
+        resBox.style.borderColor = '#f59e0b';
+        resBox.style.background = 'rgba(245, 158, 11, 0.12)';
+        FrontoAudio.playRatchet(900);
+        resBox.innerHTML = `
+          <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
+            ⚠️ LECTURAS INCOMPLETAS PARA EL CÁLCULO
+          </div>
+          <div style="color: #cbd5e1; font-size: 0.82rem; line-height: 1.4;">
+            Para obtener la graduación completa de la lente necesitas realizar y registrar <strong>ambas lecturas</strong>:<br>
+            • ${p1User === null ? '❌ <strong>1ª Lectura (P1 y Eje):</strong> Pendiente de registrar.' : '✅ <strong>1ª Lectura:</strong> Registrada (' + formatDiopter(p1User) + ' D a ' + axUser + '°)'}<br>
+            • ${p2User === null ? '❌ <strong>2ª Lectura (P2):</strong> Pendiente de registrar.' : '✅ <strong>2ª Lectura:</strong> Registrada (' + formatDiopter(p2User) + ' D)'}<br>
+            <span style="color: #94a3b8; font-size: 0.76rem; margin-top: 4px; display: inline-block;">
+              Gira los tambores para enfocar cada meridiano y pulsa sus respectivos botones antes de calificar.
+            </span>
+          </div>
+        `;
+        return;
+      }
+
       const target = frontoState.blindLens;
-      const drumPower = frontoState.power;
-      const drumAxis = frontoState.axis;
+      const p1Direct = target.sph;
+      const p2Direct = target.sph + target.cyl;
+      const axDirect = target.axis;
+      const cylDirect = target.cyl;
 
-      const p1 = target.sph;
-      const p2 = target.sph + target.cyl;
-      const ax1 = target.axis;
-      const ax2 = (target.axis + 90) % 180;
-
-      const diffP1 = Math.abs(drumPower - p1);
-      const diffP2 = Math.abs(drumPower - p2);
+      // Forma transpuesta (cilindro positivo o lectura inversa)
+      const p1Trans = p2Direct;
+      const p2Trans = p1Direct;
+      const axTrans = (target.axis + 90) % 180;
+      const cylTrans = -target.cyl;
 
       function getMinAngleDiff(a, b) {
         let diff = Math.abs((a - b + 180) % 180);
@@ -3387,69 +3608,122 @@
         return diff;
       }
 
-      const diffAx1 = getMinAngleDiff(drumAxis, ax1);
-      const diffAx2 = getMinAngleDiff(drumAxis, ax2);
+      // Determinar si el alumno midió en forma directa o transpuesta
+      const errDirect = Math.abs(p1User - p1Direct) + Math.abs(p2User - p2Direct);
+      const errTrans = Math.abs(p1User - p1Trans) + Math.abs(p2User - p2Trans);
 
-      const isCentered = Math.abs(frontoState.shiftX) < 1.5 && Math.abs(frontoState.shiftY) < 1.5;
-      const prismInduced = (Math.sqrt(frontoState.shiftX * frontoState.shiftX + frontoState.shiftY * frontoState.shiftY) * 0.38).toFixed(2);
+      const isTransposed = errTrans < errDirect;
+      const p1Target = isTransposed ? p1Trans : p1Direct;
+      const p2Target = isTransposed ? p2Trans : p2Direct;
+      const axTarget = isTransposed ? axTrans : axDirect;
+      const cylTarget = isTransposed ? cylTrans : cylDirect;
 
+      const cylUser = Math.round((p2User - p1User) * 100) / 100;
+      const diffP1 = Math.abs(p1User - p1Target);
+      const diffP2 = Math.abs(p2User - p2Target);
+      const diffCyl = Math.abs(cylUser - cylTarget);
+      const diffAx = getMinAngleDiff(axUser, axTarget);
+
+      const prismUser = frontoState.blindExam.prism;
+      const isSpherical = Math.abs(target.cyl) < 0.1;
+
+      // Tolerancias ópticas según norma ISO 8598 e ISO 21987
       const powerTol = 0.25;
-      const axisTol = Math.abs(target.cyl) <= 0.5 ? 8 : (Math.abs(target.cyl) <= 1.5 ? 4 : 2);
+      const axisTol = isSpherical ? 180 : (Math.abs(target.cyl) <= 0.5 ? 8 : (Math.abs(target.cyl) <= 1.5 ? 4 : 2));
+      const prismTol = 0.50; // Tolerancia de centrado (0.5Δ)
 
-      let matchMode = null;
-      let powerPass = false;
-      let axisPass = false;
+      const passP1 = diffP1 <= powerTol;
+      const passP2 = diffP2 <= powerTol;
+      const passCyl = diffCyl <= powerTol;
+      const passAx = isSpherical || diffAx <= axisTol;
+      const passCenter = prismUser <= prismTol;
 
-      if (diffP1 <= diffP2) {
-        matchMode = 'P1 (Esfera Principal)';
-        powerPass = diffP1 <= powerTol;
-        axisPass = Math.abs(target.cyl) < 0.1 || diffAx1 <= axisTol;
-      } else {
-        matchMode = 'P2 (Segundo Meridiano)';
-        powerPass = diffP2 <= powerTol;
-        axisPass = Math.abs(target.cyl) < 0.1 || diffAx2 <= axisTol;
-      }
-
-      const passed = powerPass && axisPass && isCentered;
+      const totalChecks = isSpherical ? 4 : 5;
+      const passedChecks = (passP1 ? 1 : 0) + (passP2 ? 1 : 0) + (passCyl ? 1 : 0) + (passCenter ? 1 : 0) + (!isSpherical && passAx ? 1 : 0);
+      const allPassed = passedChecks === totalChecks;
 
       resBox.style.display = 'flex';
-      if (passed) {
+      if (allPassed) {
         resBox.style.borderColor = '#22c55e';
         resBox.style.background = 'rgba(34, 197, 94, 0.12)';
         FrontoAudio.playRatchet(1900);
         setTimeout(() => FrontoAudio.playRatchet(2200), 120);
-        resBox.innerHTML = `
-          <div style="font-weight: 800; color: #4ade80; font-size: 0.95rem;">
-            ✅ ¡EXCELENTE MEDICIÓN! (Aprobado según ISO 8598)
-          </div>
-          <div style="color: #cbd5e1; font-size: 0.8rem; line-height: 1.4;">
-            • <strong>Receta real de la lente incógnita:</strong> <code style="color: #38bdf8;">${formatRecipe(target.sph, target.cyl, target.axis)}</code><br>
-            • <strong>Tu lectura en tambor:</strong> ${formatDiopter(drumPower)} D (Meridiano: ${matchMode})<br>
-            • <strong>Tu eje transportador:</strong> ${drumAxis}° (Error: ${matchMode.startsWith('P1') ? diffAx1 : diffAx2}° | Tol ISO: ±${axisTol}°)<br>
-            • <strong>Centrado de lente:</strong> ${isCentered ? 'Impecable (0.00Δ)' : 'Descentrada (' + prismInduced + 'Δ)'}
-          </div>
-        `;
       } else {
         resBox.style.borderColor = '#ef4444';
         resBox.style.background = 'rgba(239, 68, 68, 0.12)';
         FrontoAudio.playRatchet(700);
-        let reasons = [];
-        if (!isCentered) reasons.push('La lente no estaba perfectamente centrada en la cruceta (Prisma residual: ' + prismInduced + 'Δ).');
-        if (!powerPass) reasons.push('La potencia en el tambor (' + formatDiopter(drumPower) + ' D) difiere de los focos (' + formatDiopter(p1) + ' D / ' + formatDiopter(p2) + ' D).');
-        if (!axisPass && Math.abs(target.cyl) >= 0.1) reasons.push('El eje transportador (' + drumAxis + '°) no coincide con el astigmatismo (' + ax1 + '° o ' + ax2 + '°).');
-
-        resBox.innerHTML = `
-          <div style="font-weight: 800; color: #f87171; font-size: 0.95rem;">
-            ❌ MEDICIÓN FUERA DE TOLERANCIA
-          </div>
-          <div style="color: #cbd5e1; font-size: 0.8rem; line-height: 1.4;">
-            ${reasons.map(r => `• ${r}`).join('<br>')}<br>
-            <span style="color: #94a3b8; font-size: 0.76rem; margin-top: 4px; display: inline-block;">
-              💡 Sugerencia: Enfoca las líneas hasta el destello nítido, rota el anillo TABO exterior del ocular para unir las líneas partidas, y alinea el cruce al punto 0Δ.
-            </span>
-          </div>
-        `;
       }
+
+      resBox.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+          <div style="font-weight: 800; font-size: 0.95rem; color: ${allPassed ? '#4ade80' : '#f87171'};">
+            ${allPassed ? '🏆 EXAMEN DE GRADUACIÓN APROBADO (ISO 8598)' : '❌ EXAMEN FUERA DE TOLERANCIA'}
+          </div>
+          <span style="font-size: 0.74rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: ${allPassed ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'}; color: ${allPassed ? '#4ade80' : '#fca5a5'};">
+            Puntuación: ${Math.round((passedChecks / totalChecks) * 100)}%
+          </span>
+        </div>
+
+        <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 4px;">
+          • Receta real de la lente: <code style="color: #38bdf8; font-weight: 800;">${formatRecipe(target.sph, target.cyl, target.axis)}</code>
+          ${isTransposed ? '<span style="color: #fbbf24; font-size: 0.72rem; margin-left: 6px;">(Mediste en forma de cilindro positivo/transpuesta)</span>' : ''}
+        </div>
+
+        <table class="blind-audit-table">
+          <thead>
+            <tr>
+              <th>Parámetro</th>
+              <th>Tu Medición</th>
+              <th>Valor Real</th>
+              <th>Tolerancia</th>
+              <th>Veredicto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1ª Lectura (P1)</strong></td>
+              <td style="color: #38bdf8; font-family: monospace;">${formatDiopter(p1User)} D</td>
+              <td style="font-family: monospace;">${formatDiopter(p1Target)} D</td>
+              <td>±${powerTol.toFixed(2)} D</td>
+              <td>${passP1 ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Desvío: ' + (p1User - p1Target > 0 ? '+' : '') + (p1User - p1Target).toFixed(2) + ' D</span>'}</td>
+            </tr>
+            <tr>
+              <td><strong>2ª Lectura (P2)</strong></td>
+              <td style="color: #f43f5e; font-family: monospace;">${formatDiopter(p2User)} D</td>
+              <td style="font-family: monospace;">${formatDiopter(p2Target)} D</td>
+              <td>±${powerTol.toFixed(2)} D</td>
+              <td>${passP2 ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Desvío: ' + (p2User - p2Target > 0 ? '+' : '') + (p2User - p2Target).toFixed(2) + ' D</span>'}</td>
+            </tr>
+            <tr>
+              <td><strong>Cilindro (P2−P1)</strong></td>
+              <td style="color: #fbbf24; font-family: monospace;">${formatDiopter(cylUser)} D</td>
+              <td style="font-family: monospace;">${formatDiopter(cylTarget)} D</td>
+              <td>±${powerTol.toFixed(2)} D</td>
+              <td>${passCyl ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Desvío: ' + (cylUser - cylTarget > 0 ? '+' : '') + (cylUser - cylTarget).toFixed(2) + ' D</span>'}</td>
+            </tr>
+            <tr>
+              <td><strong>Eje Transportador</strong></td>
+              <td style="color: #4ade80; font-family: monospace;">${axUser}°</td>
+              <td style="font-family: monospace;">${isSpherical ? 'N/A' : axTarget + '°'}</td>
+              <td>${isSpherical ? 'N/A' : '±' + axisTol + '°'}</td>
+              <td>${passAx ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Error: ' + diffAx + '°</span>'}</td>
+            </tr>
+            <tr>
+              <td><strong>Centrado Óptico</strong></td>
+              <td style="font-family: monospace;">${prismUser.toFixed(2)} Δ</td>
+              <td style="font-family: monospace;">0.00 Δ</td>
+              <td>≤ ${prismTol.toFixed(2)} Δ</td>
+              <td>${passCenter ? '<span style="color: #4ade80;">✅ Impecable</span>' : '<span style="color: #f87171;">❌ Descentrada (' + prismUser.toFixed(2) + 'Δ)</span>'}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="font-size: 0.77rem; color: #94a3b8; line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
+          ${allPassed 
+            ? '🎉 <strong>Dictamen Oficial:</strong> Lente aprobada para biselado y montaje según normas internacionales de laboratorio oftálmico.' 
+            : '💡 <strong>Consejo de Taller:</strong> Asegúrate de centrar la cruceta antes de tomar P1, y gira el tambor hasta que cada conjunto de líneas alcance el destello máximo de nitidez.'}
+        </div>
+      `;
     }
 
     // Funciones del Prisma Compensador de Risley (0 a 20Δ)
@@ -4519,27 +4793,44 @@
           alertBox.style.background = "rgba(251, 191, 36, 0.18)";
           alertBox.style.borderColor = "var(--cmd-color)";
           alertBox.style.color = "#fde047";
-          alertBox.innerHTML = `⚠️ <strong>Paso 2 (Lente descentrada):</strong> El centro óptico está desplazado. Desplaza la lente para centrar el cruce en el punto 0Δ y baja la pinza.`;
-        } else if (isSplit && frontoState.targetType.startsWith('cross')) {
-          alertBox.style.background = "rgba(244, 63, 94, 0.18)";
-          alertBox.style.borderColor = "var(--m2-color)";
-          alertBox.style.color = "#fda4af";
-          alertBox.innerHTML = `⚠️ <strong>Paso 4 (Líneas partidas / quebradas):</strong> El aro de grados del ocular (${frontoState.axis}°) no coincide con el astigmatismo. Gira el aro de eje hasta unirlas en trazo continuo.`;
-        } else if (d1 < 0.15) {
-          alertBox.style.background = "rgba(34, 197, 94, 0.22)";
-          alertBox.style.borderColor = "var(--retina-color)";
-          alertBox.style.color = "#4ade80";
-          alertBox.innerHTML = `🎯 <strong>¡Mira Enfocada a ${formatDiopter(frontoState.power)} D!</strong> Observa si las líneas son continuas. Si están partidas, alinea el eje del ocular.`;
-        } else if (d2 < 0.15) {
-          alertBox.style.background = "rgba(34, 197, 94, 0.22)";
-          alertBox.style.borderColor = "var(--retina-color)";
-          alertBox.style.color = "#4ade80";
-          alertBox.innerHTML = `🎯 <strong>¡Segundo Meridiano Enfocado a ${formatDiopter(frontoState.power)} D!</strong> Las líneas perpendiculares están nítidas. Anota la diferencia de potencias para el cilindro.`;
+          alertBox.innerHTML = `⚠️ <strong>Paso 2 (Lente descentrada):</strong> El centro óptico está desplazado. Centra la cruceta en el punto 0Δ y baja la pinza antes de medir.`;
+        } else if (frontoState.blindExam.p1 === null) {
+          // Fase 1: Buscando P1 y alineando eje
+          if (isSplit && frontoState.targetType.startsWith('cross')) {
+            alertBox.style.background = "rgba(244, 63, 94, 0.18)";
+            alertBox.style.borderColor = "var(--m2-color)";
+            alertBox.style.color = "#fda4af";
+            alertBox.innerHTML = `⚠️ <strong>Paso 1 (Líneas partidas / quebradas):</strong> El aro de grados del ocular (${frontoState.axis}°) no coincide con el astigmatismo. Arrastra el aro exterior para unirlas.`;
+          } else if (d1 < 0.15 || d2 < 0.15) {
+            alertBox.style.background = "rgba(34, 197, 94, 0.22)";
+            alertBox.style.borderColor = "var(--retina-color)";
+            alertBox.style.color = "#4ade80";
+            alertBox.innerHTML = `🎯 <strong>¡Mira Enfocada a ${formatDiopter(frontoState.power)} D!</strong> Si las líneas están continuas, pulsa <strong>"📌 Tomar 1ª Lectura"</strong>.`;
+          } else {
+            alertBox.style.background = "rgba(56, 189, 248, 0.15)";
+            alertBox.style.borderColor = "var(--primary)";
+            alertBox.style.color = "#7dd3fc";
+            alertBox.innerHTML = `🕶️ <strong>Paso 1:</strong> Gira el tambor cilíndrico hasta enfocar las 3 líneas finas y rota el aro de eje exterior hasta unirlas. Luego pulsa <em>"📌 Tomar 1ª Lectura"</em>.`;
+          }
+        } else if (frontoState.blindExam.p2 === null) {
+          // Fase 2: Buscando P2
+          if (d1 < 0.15 || d2 < 0.15) {
+            alertBox.style.background = "rgba(34, 197, 94, 0.22)";
+            alertBox.style.borderColor = "var(--retina-color)";
+            alertBox.style.color = "#4ade80";
+            alertBox.innerHTML = `🎯 <strong>¡Líneas Perpendiculares Enfocadas a ${formatDiopter(frontoState.power)} D!</strong> Pulsa <strong>"📌 Tomar 2ª Lectura"</strong> para deducir el cilindro.`;
+          } else {
+            alertBox.style.background = "rgba(244, 63, 94, 0.15)";
+            alertBox.style.borderColor = "var(--m2-color)";
+            alertBox.style.color = "#fda4af";
+            alertBox.innerHTML = `🕶️ <strong>Paso 2:</strong> 1ª Lectura guardada (${formatDiopter(frontoState.blindExam.p1)} D a ${frontoState.blindExam.axis1}°). Gira el tambor hasta enfocar las 2 barras gruesas perpendiculares y pulsa <em>"📌 Tomar 2ª Lectura"</em>.`;
+          }
         } else {
-          alertBox.style.background = "rgba(56, 189, 248, 0.15)";
-          alertBox.style.borderColor = "var(--primary)";
-          alertBox.style.color = "#7dd3fc";
-          alertBox.innerHTML = `🕶️ <strong>Modo Taller a Ciegas:</strong> Gira el tambor cilíndrico de potencias hasta encontrar el primer meridiano focal nítido.`;
+          // Ambas lecturas tomadas
+          alertBox.style.background = "rgba(34, 197, 94, 0.22)";
+          alertBox.style.borderColor = "var(--retina-color)";
+          alertBox.style.color = "#4ade80";
+          alertBox.innerHTML = `🎯 <strong>Lecturas 1 y 2 registradas:</strong> Fórmula deducida en banco. Pulsa <strong>"🎯 Calificar Examen Completo"</strong> para auditar tu resultado según ISO 8598.`;
         }
         return;
       }
