@@ -1,0 +1,154 @@
+/* Cuaderno de laboratorio: superficies claras de lectura, instrumentos oscuros. */
+:root {
+  --paper: #f3f6f6;
+  --ink: #142d39;
+  --teal: #096562;
+  --rule: #cbdad9;
+  --font: "Segoe UI", Roboto, sans-serif;
+}
+body { background: var(--paper); }
+header { background: #fff; border-color: var(--rule); padding: 14px clamp(16px, 2.4vw, 40px); color: var(--ink); }
+.brand { gap: 12px; }
+.brand-icon { width: 40px; height: 40px; border-radius: 12px; background: var(--teal); box-shadow: none; }
+.brand h1 { font-size: 1.18rem; letter-spacing: -.035em; }
+.brand p { color: #526771; }
+.top-actions label, .sidebar-toggle-btn { background: #eff5f4; color: #244c50; border: 1px solid var(--rule); box-shadow: none; min-height: 36px; }
+.lens-toggle input { accent-color: var(--teal); }
+.workspace { background: var(--paper); padding: clamp(16px, 2vw, 36px); gap: 16px; min-width: 0; }
+.module-intro {
+  position: relative; isolation: isolate; overflow: hidden; flex-shrink: 0;
+  background: #113e49; color: white; border-radius: 16px;
+  padding: clamp(20px, 2.1vw, 34px); display: flex; align-items: center;
+}
+.module-intro h2 { font: 500 clamp(1.9rem, 3vw, 3.15rem)/1.05 Georgia, serif; letter-spacing: -.045em; }
+.module-intro p { color: #d1e9e7; font-size: .91rem; margin-top: 9px; line-height: 1.45; }
+.module-intro > div:first-child { max-width: 72%; }
+.optical-mark { position: absolute; right: 3%; width: 22%; height: 140%; top: -20%; z-index: -1; transform: rotate(12deg); }
+.optical-mark i { position: absolute; top: -6%; height: 112%; width: 53%; border: 1px solid #79c0bb; border-radius: 50%; background: linear-gradient(90deg, transparent, #87d7cc24); }
+.optical-mark i:nth-child(2) { left: 23%; }
+.optical-mark i:nth-child(3) { left: 46%; }
+.optical-mark::after { content: ""; position: absolute; left: -22%; right: -30%; top: 50%; border-top: 1px dashed #76a4a4; }
+.main-nav-tabs { background: #fff; border-color: var(--rule); box-shadow: none; padding: 5px; gap: 5px; }
+.main-nav-btn { color: #4a6069; justify-content: center; flex: 1; min-height: 36px; font-size: .86rem; }
+.main-nav-btn:hover { background: #e6f1ee; color: var(--ink); }
+.main-nav-btn.active { background: var(--teal); color: white; box-shadow: none; }
+.sidebar { background: #fff; color: var(--ink); border-color: var(--rule); padding: 22px 16px; }
+.sidebar-content { gap: 24px; }
+.section-title { color: #31515b; font-size: .75rem; letter-spacing: .09em; }
+#studyCase { width: 100%; font: 600 .88rem var(--font); color: var(--ink); padding: 12px 6px; border: 1px solid #a9c3c0; background: #f3f9f7; border-radius: 8px; }
+.control-card { background: white; border: 1px solid var(--rule); padding: 15px; gap: 18px; }
+.control-card .input-header { color: var(--ink); }
+.control-card .step-btn { background: #f0f6f5; color: var(--teal); border-color: var(--rule); }
+.control-card input { accent-color: var(--teal); min-width: 0; }
+.control-card .val-badge { background: #e9f3f0; color: #075954; border: none; }
+.axis-dial-wrapper { background: #152737; }
+.tab-view { gap: 14px; }
+.viewport-card { background: #fff; border-color: var(--rule); padding: clamp(12px, 1.3vw, 22px); color: var(--ink); }
+.viewport-header h2 svg { display: none; }
+.view-subtabs { background: #eff5f4; border-color: var(--rule); }
+.view-subtab { color: #3b5960; min-height: 30px; }
+.view-subtab.active { background: #185b5d; color: white; }
+.canvas-container { background-color: #101e2c; background-image: linear-gradient(#7596a410 1px,transparent 1px), linear-gradient(90deg,#7596a410 1px,transparent 1px),radial-gradient(ellipse at 64% 50%,#1b3444,#0d1927); background-size: 24px 24px,24px 24px,100% 100%; }
+.plot-caption { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; font-size: .75rem; color: #405962; }
+.plot-caption span { display: inline-flex; align-items: center; gap: 5px; }
+.plot-caption b { width: 16px; border-top: 3px solid #0284b9; }
+.plot-caption .key-m2 { border-color: #ce3557; }
+#plotState { margin-left: auto; font-weight: 650; }
+.diag-box,.transposition-box,.clinical-card { background: white; color: var(--ink); border-color: var(--rule); padding: 16px; }
+.diag-box::before { background: var(--teal); width: 3px; }
+.diag-label { color: #526b74; font-weight: 700; margin-bottom: 7px; }
+.diag-title { flex-wrap: wrap; color: var(--ink); }
+.diag-badge,.trans-row { background: #edf5f3; border: none; color: #28545a; }
+.diag-desc,.clinical-card p,.clinical-card li { color: #405660; }
+.clinical-card h3,.trans-row code { color: var(--ink); }
+.meridian-card { background: #172a39; }
+.feedback-box p { margin-top: .65em; line-height: 1.5; }
+.quiz-container > div { flex-wrap: wrap; gap: 8px; }
+:focus-visible { outline: 3px solid #db8309; outline-offset: 2px; }
+@media (min-width:1025px) {
+  body { height: 100dvh; }
+  .main-container { height: auto; min-height: 0; }
+  .sidebar { scrollbar-width: thin; }
+}
+@media (max-width:1024px) {
+  .workspace { padding: 12px; }
+  .sidebar { padding: 10px 12px; }
+  .mobile-sidebar-toggle { box-shadow: none; background: #173f48; border-color: #173f48; }
+  .main-nav-tabs { margin: 0; }
+}
+@media (max-width:550px) {
+  header { padding: 10px 12px; }
+  .brand-icon { width: 30px; height: 30px; }
+  .brand h1 { font-size: 1rem; }
+  .module-intro { padding: 17px; }
+  .module-intro p { font-size: .81rem; }
+  .main-nav-tabs { display: grid; grid-template-columns: 1fr 1fr; }
+  .main-nav-btn { min-height: 34px; }
+  .plot-caption { gap: 8px; }
+}
+.fronto-header-toolbar { grid-column: 1 / -1; }
+.fronto-tutorial-left { min-width: 0; }
+.fronto-step-bar { max-width: 100%; }
+@media (max-width:1024px) {
+  .sidebar-toggle-btn { display: none; }
+  .fronto-container, .fronto-container.fullscreen-active { grid-template-columns: minmax(0,1fr); }
+  .fronto-container.fullscreen-active { padding: 10px; }
+  .fronto-container.fullscreen-active .fronto-header-toolbar { grid-column: 1; position: static; }
+  .fronto-container.fullscreen-active .fronto-view-box { min-height: auto; }
+  .fronto-container.fullscreen-active .fronto-eyepiece-housing { width: min(75vw,55vh); height: min(75vw,55vh); }
+  .fronto-container.fullscreen-active .fronto-controls { max-height: none; }
+  .fronto-container > *, .fronto-controls input[type="range"] { min-width: 0; }
+  .fronto-tutorial-left { flex-basis: 100%; }
+  .fronto-step-bar { flex-wrap: wrap; }
+}
+.canvas-container { height: clamp(320px,43vh,480px); }
+.eye-reading { font-size: .88rem; font-weight: 600; color: var(--ink); }
+.lens-reading:not([hidden]) { display: grid; gap: .3rem; margin-top: .6rem; padding: .65rem .85rem; border-left: 3px solid #176a70; background: #eff6f5; color: var(--ink); font-size: .9rem; }
+#lens3d { margin-top: 1rem; border-top: 1px solid #b9cdce; padding-top: .75rem; }
+#lens3d summary { cursor: pointer; color: #12585c; font-weight: 700; }
+.lens-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; margin: .8rem 0; }
+.lens-controls button, .lens-controls select { font: inherit; color: #18454a; background: #eff6f5; border: 1px solid #aac7c7; border-radius: .4rem; padding: .35rem .6rem; }
+#solidCanvas { display: block; width: 100%; height: clamp(230px, 32vw, 350px); background: radial-gradient(ellipse at 45% 36%, #254452, #101e2c); border-radius: .6rem; touch-action: none; cursor: grab; }
+#solidCanvas:active { cursor: grabbing; }
+#lens3d small { display: block; margin-top: .4rem; }
+#solidMeasures { font-weight: 600; margin: .7rem 0 .25rem; }
+.plot-caption .key-cmd { width: 8px; height: 8px; border: none; background: #b78117; border-radius: 50%; }
+#eyeSturmKey[hidden] { display: none; }
+@media (max-width:550px) { .canvas-container { height: 260px; } }
+.rx-entry { display: inline-flex; align-items: center; gap: 3px; padding: 0 7px; border: 1px solid #94b4af; border-radius: 6px; background: #f4faf8; color: #075954; font: 600 .95rem monospace; }
+.rx-entry:focus-within { outline: 2px solid var(--teal); }
+.rx-entry input { width: 6ch; padding: 5px 0; text-align: right; font: inherit; color: inherit; background: transparent; border: 0; outline: none; }
+.rx-message { color: #894318; font-size: .8rem; }
+.rx-message:empty { display: none; }
+.demo-actions, .fronto-mobile-controls > div { display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
+.demo-actions { color:#d3e4ec; font-size:.83rem; justify-content:flex-start; }
+#view-lensometer .demo-actions button, #view-lensometer .bench-detail button,
+#view-lensometer .capture-next, #view-lensometer #requestHint { width:auto; padding:6px 12px; }
+.bench-detail,.fronto-settings { align-self:stretch; padding:10px 12px; background:#101f2d; border:1px solid #344953; border-radius:8px; color:#dfebef; font-size:.85rem; }
+.bench-detail summary,.fronto-settings summary { cursor:pointer; font-weight:650; }
+.bench-detail canvas { display:block; width:100%; max-width:340px; margin:auto; }
+.bench-detail span { display:block; margin-bottom:8px; }
+.fronto-settings > div { margin-top:12px; flex-wrap:wrap; }
+.fronto-mobile-controls, #view-lensometer .capture-next, #view-lensometer #requestHint { display:none; }
+body[data-fronto-mode="guided"] #view-lensometer #requestHint { display:inline-flex; }
+body:is([data-fronto-mode="blind"],[data-fronto-mode="guided"]) #view-lensometer :is(.demo-actions,.fronto-tutorial-right,.demo-only),
+body[data-fronto-mode="blind"] #frontoTutorialHeaderElem { display:none; }
+body[data-active-tab="lensometer"]:is([data-fronto-mode="blind"],[data-fronto-mode="guided"]) :is(#mainSidebar,#sidebarToggleBtn,#mobileFloatingGradBtn,.lens-toggle) { display:none !important; }
+@media(min-width:1025px) {
+  body[data-active-tab="lensometer"]:is([data-fronto-mode="blind"],[data-fronto-mode="guided"]) .main-container {grid-template-columns:minmax(0,1fr);}
+}
+#view-lensometer button:disabled { opacity:.5; cursor:default; }
+@media(max-width:1024px) {
+  .fronto-mobile-controls { display:grid; gap:5px; width:100%; max-width:320px; }
+  .fronto-mobile-controls > div { display:grid; grid-template-columns:1fr 44px minmax(7ch,auto) 44px; }
+  .fronto-mobile-controls output { text-align:center; font:600 .85rem monospace; color:#d9efe6; }
+  .fronto-mobile-controls button { height:44px; border:1px solid #486070; border-radius:7px; background:#213442; color:white; font-size:1.15rem; }
+  body:is([data-fronto-mode="guided"],[data-fronto-mode="blind"]) #view-lensometer .capture-next { display:block; min-height:44px; }
+  .fronto-header-toolbar > div { flex-wrap:wrap; }
+}
+body:is([data-fronto-mode="blind"],[data-fronto-mode="guided"]) #view-lensometer #padCenter { display:block; visibility:hidden; }
+@media(max-width:1024px) {
+  body[data-active-tab="lensometer"] .workspace { overflow:visible; }
+  body[data-active-tab="lensometer"] .main-nav-tabs { position:static; }
+  .fronto-view-box { position:static; }
+}
