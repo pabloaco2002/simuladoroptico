@@ -2,1938 +2,60 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador Óptico Integral - Técnico Óptico</title>
-  <style>
-    :root {
-      --bg-main: #0a0e17;
-      --bg-card: #131a26;
-      --bg-card-subtle: #1a2333;
-      --border: #26354a;
-      --border-light: #3b4e6d;
-      --text-main: #f1f5f9;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
-      --primary: #38bdf8;
-      --primary-glow: rgba(56, 189, 248, 0.35);
-      --m1-color: #38bdf8;
-      --m2-color: #f43f5e;
-      --retina-color: #22c55e;
-      --cmd-color: #fbbf24;
-      --lens-color: #a855f7;
-      --radius: 12px;
-      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background-color: var(--bg-main);
-      color: var(--text-main);
-      font-family: var(--font);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* HEADER */
-    header {
-      background: linear-gradient(180deg, #151f30 0%, #0c1320 100%);
-      border-bottom: 1px solid var(--border);
-      padding: 8px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-icon {
-      width: 34px;
-      height: 34px;
-      background: linear-gradient(135deg, var(--primary), #818cf8);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 0 14px var(--primary-glow);
-    }
-
-    .brand-icon svg { width: 20px; height: 20px; fill: #fff; }
-    .brand h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: -0.02em; }
-    .brand p { font-size: 0.76rem; color: var(--text-muted); }
-
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .sidebar-toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 6px 13px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 0.78rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-
-    .sidebar-toggle-btn:hover {
-      border-color: var(--primary);
-      background: #1f2b3e;
-      color: #fff;
-    }
-
-    .sidebar-toggle-btn.collapsed {
-      background: rgba(56, 189, 248, 0.15);
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-
-    .lens-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg-card-subtle);
-      padding: 6px 14px;
-      border-radius: 30px;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      font-size: 0.82rem;
-      font-weight: 600;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-
-    .lens-toggle:hover { border-color: var(--primary); }
-    .lens-toggle input { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
-
-    /* LAYOUT PRINCIPAL */
-    .main-container {
-      display: grid;
-      grid-template-columns: clamp(280px, 24vw, 360px) 1fr;
-      flex: 1;
-      height: calc(100vh - 54px);
-      overflow: hidden;
-      transition: grid-template-columns 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @media (min-width: 1025px) {
-    .main-container.sidebar-collapsed {
-      grid-template-columns: 0px 1fr;
-    }
-
-    .main-container.sidebar-collapsed .sidebar {
-      padding: 0 !important;
-      border-right: none !important;
-      width: 0 !important;
-      min-width: 0 !important;
-      opacity: 0;
-      pointer-events: none;
-      overflow: hidden !important;
-    }
-
-    }
-    /* SIDEBAR */
-    .sidebar {
-      background: var(--bg-card);
-      border-right: 1px solid var(--border);
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      scrollbar-width: thin;
-      transition: opacity 0.2s ease, padding 0.2s ease, width 0.22s ease;
-    }
-
-    .mobile-sidebar-toggle {
-      display: none;
-    }
-
-    .mobile-close-controls-btn {
-      display: none;
-    }
-
-    .mobile-floating-grad-btn {
-      display: none;
-    }
-
-    .sidebar-content {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .section-title {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--primary);
-      font-weight: 700;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .presets-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .preset-btn {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 9px 10px;
-      border-radius: 8px;
-      font-size: 0.74rem;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 4px;
-    }
-
-    .preset-btn:hover {
-      border-color: var(--primary);
-      background: #223048;
-      transform: translateY(-1px);
-    }
-
-    .preset-btn .p-name {
-      font-weight: 700;
-      color: #f1f5f9;
-      display: block;
-      font-size: 0.76rem;
-    }
-
-    .preset-btn .p-recipe {
-      font-family: monospace;
-      font-weight: 600;
-      color: var(--primary);
-      font-size: 0.77rem;
-    }
-
-    .p-tag {
-      display: inline-block;
-      align-self: flex-start;
-      font-size: 0.62rem;
-      font-weight: 700;
-      padding: 2px 6px;
-      border-radius: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.02em;
-    }
-
-    .tag-retina { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
-    .tag-front { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
-    .tag-back { background: rgba(244, 63, 94, 0.2); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.4); }
-    .tag-mixed { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
-
-    .control-card {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .input-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      font-weight: 600;
-    }
-
-    .val-badge {
-      background: #0b111a;
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      font-family: monospace;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--primary);
-      min-width: 80px;
-      text-align: right;
-    }
-
-    .slider-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .step-btn {
-      width: 32px;
-      height: 32px;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-main);
-      font-weight: 700;
-      font-size: 1.1rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-    }
-
-    .step-btn:hover {
-      background: var(--primary);
-      color: #000;
-      border-color: var(--primary);
-    }
-
-    input[type="range"] {
-      flex: 1;
-      accent-color: var(--primary);
-      cursor: pointer;
-      height: 6px;
-      background: #334155;
-      border-radius: 3px;
-    }
-
-    .axis-dial-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      background: #0b111a;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-    }
-
-    .axis-canvas {
-      width: 70px;
-      height: 70px;
-      cursor: grab;
-    }
-
-    .axis-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    /* WORKSPACE Y NAVEGACIÓN POR PESTAÑAS */
-    .workspace {
-      display: flex;
-      flex-direction: column;
-      background: #080c13;
-      overflow-y: auto;
-      padding: 18px 22px;
-      gap: 18px;
-    }
-
-    .main-nav-tabs {
-      display: flex;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 4px;
-      gap: 4px;
-      overflow-x: auto;
-      scrollbar-width: thin;
-      flex-shrink: 0;
-    }
-
-    .main-nav-btn {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 8px 14px;
-      border-radius: 7px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .main-nav-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.04);
-    }
-
-    .main-nav-btn.active {
-      background: var(--primary);
-      color: #080c13;
-      font-weight: 700;
-      box-shadow: 0 0 14px var(--primary-glow);
-    }
-
-    /* CONTENEDORES DE PESTAÑAS */
-    .tab-view {
-      display: none;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .tab-view.active {
-      display: flex;
-    }
-
-    /* DIAGNÓSTICOS SUPERIORES */
-    .top-diagnostics {
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: 16px;
-    }
-
-    .diag-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .diag-box::before {
-      content: "";
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 5px;
-      background: var(--primary);
-    }
-
-    .diag-label {
-      font-size: 0.74rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .diag-title {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: #fff;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .diag-badge {
-      font-size: 0.72rem;
-      padding: 3px 8px;
-      border-radius: 4px;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      font-weight: 600;
-    }
-
-    .diag-desc {
-      font-size: 0.86rem;
-      color: #cbd5e1;
-      line-height: 1.5;
-    }
-
-    .transposition-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .trans-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: var(--bg-card-subtle);
-      font-size: 0.83rem;
-    }
-
-    .trans-row code {
-      font-family: monospace;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--cmd-color);
-    }
-
-    /* VISTA 1: CANVAS OJO */
-    .viewport-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .viewport-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .view-subtabs {
-      display: flex;
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      padding: 3px;
-      border-radius: 8px;
-      gap: 4px;
-    }
-
-    .view-subtab {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 5px 12px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .view-subtab.active {
-      background: var(--primary);
-      color: #0c1017;
-    }
-
-    .canvas-container {
-      position: relative;
-      width: 100%;
-      height: 360px;
-      background: radial-gradient(circle at 65% 50%, #151e30 0%, #070c14 85%);
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-
-    canvas#eyeCanvas { width: 100%; height: 100%; display: block; }
-
-    .meridians-summary {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-    }
-
-    .meridian-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .m-header { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; }
-    .m-dot { width: 10px; height: 10px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
-    .m-stat { font-size: 1.15rem; font-weight: 800; font-family: monospace; }
-    .m-status { font-size: 0.78rem; color: var(--text-muted); line-height: 1.4; }
-
-    .badge-status {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-    .status-miope { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
-    .status-hiper { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid #f43f5e; }
-    .status-emetrope { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid #22c55e; }
-
-    .clinical-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .clinical-card h3 { font-size: 0.95rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px; }
-    .clinical-card p { font-size: 0.86rem; color: #94a3b8; line-height: 1.5; }
-    .clinical-card ul { list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 6px; }
-    .clinical-card li { font-size: 0.84rem; display: flex; align-items: flex-start; gap: 8px; color: #e2e8f0; }
-    .bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 7px; flex-shrink: 0; }
-
-    /* VISTA 2: CRUZ ÓPTICA */
-    .cross-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .cross-canvas-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .cross-canvas {
-      width: min(340px, 85vw);
-      height: min(340px, 85vw);
-      max-width: 100%;
-      aspect-ratio: 1 / 1;
-      display: block;
-    }
-
-    .cross-explanation {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .cross-step {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      font-size: 0.86rem;
-      line-height: 1.5;
-    }
-    .cross-step strong { color: var(--primary); }
-
-    /* VISTA: FRONTOFOCÓMETRO INTERACTIVO DE TALLER */
-    .fronto-container {
-      display: grid;
-      grid-template-columns: clamp(320px, 32vw, 420px) 1fr;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .fronto-tutorial-header {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 8px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      grid-column: span 2;
-    }
-
-    .fronto-tutorial-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .fronto-tutorial-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      flex: 1;
-    }
-
-    .fronto-tutorial-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .fronto-guide-toggle-btn {
-      background: #141f30;
-      border: 1px solid var(--border);
-      color: #93c5fd;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-    }
-
-    .fronto-guide-toggle-btn:hover {
-      border-color: var(--primary);
-      background: #1e2c45;
-      color: #fff;
-    }
-
-    .fronto-guide-toggle-btn.active {
-      background: rgba(56, 189, 248, 0.2);
-      border-color: var(--primary);
-      color: #38bdf8;
-    }
-
-    .fronto-step-bar {
-      display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      scrollbar-width: thin;
-    }
-
-    .fronto-step-btn {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 5px 9px;
-      border-radius: 6px;
-      font-size: 0.73rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .fronto-step-btn:hover {
-      border-color: var(--primary);
-      color: #fff;
-    }
-
-    .fronto-step-btn.active {
-      background: var(--primary);
-      color: #080c13;
-      box-shadow: 0 0 10px var(--primary-glow);
-    }
-
-    .fronto-step-btn .step-num {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      background: rgba(0,0,0,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.68rem;
-    }
-
-    .fronto-step-drawer {
-      transition: all 0.2s ease;
-      font-size: 0.8rem;
-      padding: 8px 12px;
-      margin-top: 2px;
-    }
-
-    .fronto-step-drawer.collapsed {
-      display: none;
-    }
-
-    .fronto-target-switch {
-      display: flex;
-      background: #090e17;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-      gap: 4px;
-      width: 100%;
-    }
-
-    .target-btn {
-      flex: 1;
-      padding: 6px 8px;
-      border: none;
-      border-radius: 6px;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 0.74rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-    }
-
-    .target-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    .target-btn.active {
-      background: #1e293b;
-      color: #38bdf8;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-    }
-
-    .fronto-view-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 9px;
-      position: sticky;
-      top: 6px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
-    }
-
-    /* CHASSIS METÁLICO DEL OCULAR */
-    .fronto-eyepiece-housing {
-      position: relative;
-      padding: 10px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #334155 0%, #1e293b 45%, #0f172a 80%, #020617 100%);
-      box-shadow: 
-        0 10px 22px rgba(0,0,0,0.65), 
-        inset 0 2px 4px rgba(255,255,255,0.25), 
-        inset 0 -3px 6px rgba(0,0,0,0.8),
-        0 0 0 3px #0f172a,
-        0 0 0 5px #1e293b;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .fronto-eyepiece-housing::before {
-      content: '';
-      position: absolute;
-      inset: 4px;
-      border-radius: 50%;
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      pointer-events: none;
-    }
-
-    .fronto-ocular {
-      width: min(280px, 36vh);
-      height: min(280px, 36vh);
-      max-width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #011206;
-      border: 3px solid #050b14;
-      border-radius: 50%;
-      position: relative;
-      overflow: hidden;
-      cursor: grab;
-      box-shadow: 
-        inset 0 0 35px rgba(0, 0, 0, 0.95),
-        inset 0 0 14px rgba(0, 0, 0, 0.9),
-        0 0 16px rgba(34, 197, 94, 0.15);
-    }
-
-    .fronto-ocular:active {
-      cursor: grabbing;
-    }
-
-    .fronto-canvas { 
-      width: 100%; 
-      height: 100%; 
-      display: block; 
-    }
-
-    .eyepiece-calib-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: #090e17;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 5px 10px;
-      width: 100%;
-      font-size: 0.76rem;
-    }
-
-    .fronto-controls {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: calc(100vh - 100px);
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-
-    .drum-control {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* TAMBOR ANALÓGICO ESTÉTICA TALLER */
-    .analog-drum-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #0b111a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-    }
-
-    .analog-drum-dial {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-    }
-
-    .analog-drum-hairline {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      width: 2px;
-      background: #ef4444;
-      transform: translateX(-50%);
-      box-shadow: 0 0 6px #ef4444;
-      z-index: 2;
-      pointer-events: none;
-    }
-
-    .drum-fine-btns {
-      display: flex;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .drum-fine-btn {
-      background: #141f2e;
-      border: 1px solid var(--border);
-      color: #94a3b8;
-      border-radius: 4px;
-      padding: 3px 7px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      font-family: monospace;
-      cursor: pointer;
-      transition: all 0.12s;
-    }
-
-    .drum-fine-btn:hover {
-      background: var(--primary);
-      color: #000;
-      border-color: var(--primary);
-    }
-
-    .shift-pad-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 40px);
-      grid-template-rows: repeat(3, 34px);
-      gap: 4px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .pad-btn {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      color: #cbd5e1;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-    }
-    .pad-btn:hover {
-      background: var(--primary);
-      color: #000;
-    }
-
-    .fronto-badge-alert {
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      font-weight: 600;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    /* ESTILOS DEL TAMBOR ANALÓGICO 3D Y AUDIO HÁPTICO */
-    .fronto-header-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      background: #0b121e;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 14px;
-      margin-bottom: 12px;
-    }
-
-    .fronto-audio-btn {
-      background: #1e293b;
-      border: 1px solid var(--border-light);
-      color: #38bdf8;
-      font-size: 0.76rem;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s;
-    }
-
-    .fronto-audio-btn:hover {
-      background: #283952;
-      border-color: var(--primary);
-    }
-
-    .fronto-audio-btn.muted {
-      color: var(--text-dim);
-      border-color: var(--border);
-      background: #0f172a;
-    }
-
-    .fronto-mode-segmented {
-      display: flex;
-      background: #070d17;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-      gap: 3px;
-    }
-
-    .fronto-mode-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.74rem;
-      font-weight: 700;
-      padding: 5px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
-    .fronto-mode-btn:hover {
-      color: #fff;
-    }
-
-    .fronto-mode-btn.active {
-      background: #1e293b;
-      color: #4ade80;
-      border: 1px solid rgba(74, 222, 128, 0.3);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-
-    /* CONTENEDOR DEL TAMBOR CILÍNDRICO 3D */
-    .fronto-drum-3d-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      background: radial-gradient(circle at 50% 30%, #1e293b 0%, #0b121e 100%);
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      padding: 12px;
-      position: relative;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 4px 12px rgba(0,0,0,0.4);
-    }
-
-    .fronto-drum-canvas {
-      width: 100%;
-      height: 105px;
-      max-width: 280px;
-      border-radius: 8px;
-      cursor: ns-resize;
-      touch-action: none;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.7);
-    }
-
-    .fronto-drum-hint {
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .fronto-clamp-box {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: #090e17;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      width: 100%;
-    }
-
-    .fronto-table-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      width: 100%;
-    }
-
-    /* CONTROLES AVANZADOS DE FRONTOFOCÓMETRO (RISLEY, LUZ, TINTE) */
-    .fronto-addon-card {
-      background: #090f1a;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .fronto-pill-segmented {
-      display: flex;
-      background: #070d17;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 2px;
-      gap: 2px;
-    }
-
-    .fronto-pill-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-      flex: 1;
-      text-align: center;
-    }
-
-    .fronto-pill-btn:hover {
-      color: #fff;
-    }
-
-    .fronto-pill-btn.active {
-      background: #1e293b;
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* MODO PANTALLA COMPLETA INMERSIVO DE TALLER */
-    .fronto-container.fullscreen-active {
-      position: fixed;
-      inset: 0;
-      z-index: 999999;
-      background: #040711;
-      width: 100vw;
-      height: 100vh;
-      overflow-y: auto;
-      padding: 16px 28px;
-      box-sizing: border-box;
-      display: grid;
-      grid-template-columns: 1fr 460px;
-      gap: 24px;
-      align-items: start;
-    }
-
-    .fronto-container.fullscreen-active .fronto-header-toolbar {
-      grid-column: span 2;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .fronto-container.fullscreen-active .fronto-view-box {
-      min-height: calc(100vh - 120px);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
-      background: radial-gradient(circle at 50% 45%, #0d1527 0%, #060a14 100%);
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.8);
-    }
-
-    .fronto-container.fullscreen-active .fronto-eyepiece-housing {
-      width: min(600px, 65vh);
-      height: min(600px, 65vh);
-      padding: 20px;
-    }
-
-    .fronto-container.fullscreen-active .fronto-ocular {
-      width: 100%;
-      height: 100%;
-    }
-
-    .fronto-container.fullscreen-active .fronto-controls {
-      max-height: calc(100vh - 120px);
-      overflow-y: auto;
-      padding-right: 6px;
-    }
-
-    /* BOTÓN FLOTANTE O DE BARRA PARA PANTALLA COMPLETA */
-    .fronto-fs-btn {
-      background: #0284c7;
-      color: #fff;
-      border: 1px solid #38bdf8;
-      font-size: 0.76rem;
-      font-weight: 800;
-      padding: 6px 13px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
-    }
-
-    .fronto-fs-btn:hover {
-      background: #0369a1;
-      transform: scale(1.03);
-    }
-
-    .fronto-fs-btn.active {
-      background: #991b1b;
-      border-color: #ef4444;
-      color: #fecaca;
-      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
-    }
-
-    /* MODO TALLER A CIEGAS (EXAMEN) */
-    .blind-eval-box {
-      background: #0b121e;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 0.82rem;
-    }
-
-    .blind-audit-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.76rem;
-      margin-top: 6px;
-    }
-
-    .blind-audit-table th {
-      background: rgba(255, 255, 255, 0.05);
-      color: #94a3b8;
-      text-align: left;
-      padding: 5px 8px;
-      font-weight: 700;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .blind-audit-table td {
-      padding: 5px 8px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      color: #e2e8f0;
-    }
-
-    .blind-audit-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    /* VISTA: MODO QUIZ */
-    .quiz-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-width: 760px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .quiz-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 14px;
-    }
-
-    .score-badge {
-      font-size: 0.9rem;
-      font-weight: 700;
-      padding: 6px 12px;
-      border-radius: 6px;
-      background: rgba(56, 189, 248, 0.15);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-    }
-
-    .question-box {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.4;
-    }
-
-    .options-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-
-    .quiz-opt-btn {
-      background: var(--bg-card-subtle);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 14px 18px;
-      border-radius: 8px;
-      font-size: 0.92rem;
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .quiz-opt-btn:hover:not(:disabled) {
-      border-color: var(--primary);
-      background: #24344d;
-    }
-
-    .quiz-opt-btn.correct {
-      background: rgba(34, 197, 94, 0.25) !important;
-      border-color: #22c55e !important;
-      color: #4ade80 !important;
-    }
-
-    .quiz-opt-btn.wrong {
-      background: rgba(244, 63, 94, 0.25) !important;
-      border-color: #f43f5e !important;
-      color: #fb7185 !important;
-    }
-
-    .feedback-box {
-      display: none;
-      padding: 14px 18px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    /* ======================================================== */
-    /* OPTIMIZACIÓN ERGONÓMICA LAPTOP / MONITOR 1366x768 */
-    /* ======================================================== */
-    @media (max-width: 1400px), (max-height: 850px) {
-      header {
-        padding: 6px 16px;
-        gap: 8px;
-      }
-      
-      .brand-icon {
-        width: 30px;
-        height: 30px;
-      }
-      .brand-icon svg { width: 18px; height: 18px; }
-      .brand h1 { font-size: 1.05rem; }
-      .brand p { font-size: 0.72rem; }
-
-      .main-container {
-        height: calc(100vh - 48px);
-        grid-template-columns: clamp(260px, 22vw, 320px) 1fr;
-      }
-
-      .workspace {
-        padding: 10px 14px;
-        gap: 10px;
-      }
-
-      .main-nav-tabs {
-        padding: 3px;
-        gap: 3px;
-      }
-
-      .main-nav-btn {
-        padding: 6px 11px;
-        font-size: 0.76rem;
-      }
-
-      /* PESTAÑA 1: RAYOS Y OJO */
-      .top-diagnostics {
-        gap: 10px;
-      }
-
-      .diag-box {
-        padding: 10px 14px;
-      }
-
-      .diag-title {
-        font-size: 1.15rem;
-        margin-bottom: 4px;
-      }
-
-      .transposition-box {
-        padding: 10px 12px;
-        gap: 6px;
-      }
-
-      .viewport-card {
-        padding: 10px 12px;
-        gap: 8px;
-      }
-
-      .canvas-container {
-        height: clamp(220px, 32vh, 290px);
-      }
-
-      .meridians-summary {
-        gap: 8px;
-      }
-
-      .meridian-card {
-        padding: 8px 12px;
-        gap: 4px;
-      }
-
-      .clinical-card {
-        padding: 12px 14px;
-        gap: 6px;
-      }
-
-      /* PESTAÑA 2: CRUZ ÓPTICA */
-      .cross-container {
-        gap: 12px;
-      }
-
-      .cross-canvas-box {
-        padding: 12px;
-      }
-
-      .cross-canvas {
-        width: min(270px, 34vh);
-        height: min(270px, 34vh);
-      }
-
-      .cross-explanation {
-        padding: 14px;
-        gap: 10px;
-      }
-
-      /* PESTAÑA 3: FRONTOFOCÓMETRO */
-      .fronto-container {
-        grid-template-columns: clamp(290px, 28vw, 360px) 1fr;
-        gap: 12px;
-      }
-
-      .fronto-tutorial-header {
-        padding: 6px 12px;
-        gap: 4px;
-      }
-
-      .fronto-tutorial-bar {
-        gap: 6px;
-      }
-
-      .fronto-step-btn {
-        padding: 4px 8px;
-        font-size: 0.71rem;
-      }
-
-      .fronto-header-toolbar {
-        padding: 4px 8px;
-        gap: 6px;
-        margin-bottom: 6px;
-      }
-
-      .fronto-view-box {
-        padding: 10px 12px;
-        gap: 8px;
-        top: 4px;
-      }
-
-      .fronto-eyepiece-housing {
-        padding: 8px;
-      }
-
-      .fronto-ocular {
-        width: min(250px, 33vh);
-        height: min(250px, 33vh);
-      }
-
-      .eyepiece-calib-box {
-        padding: 4px 8px;
-        font-size: 0.72rem;
-      }
-
-      .fronto-controls {
-        padding: 12px 14px;
-        gap: 10px;
-        max-height: calc(100vh - 90px);
-      }
-
-      .drum-control {
-        padding: 8px 12px;
-        gap: 6px;
-      }
-
-      .fronto-drum-3d-wrap {
-        padding: 8px;
-      }
-
-      .fronto-drum-canvas {
-        height: 86px;
-        max-width: 250px;
-      }
-
-      .fronto-clamp-box {
-        padding: 6px 10px;
-      }
-
-      /* PESTAÑA 4: MODO QUIZ */
-      .quiz-container {
-        padding: 16px;
-        gap: 14px;
-      }
-    }
-
-    /* ======================================================== */
-    /* RESPONSIVE DESIGN Y OPTIMIZACIÓN MOBILE (TABLETS Y SMARTPHONES) */
-    /* ======================================================== */
-    @media (max-width: 1024px) {
-      .main-container {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-        min-height: calc(100vh - 60px);
-        overflow: visible;
-      }
-
-      /* Menú de Graduación y Casos Clínicos en la parte superior en móvil */
-      .sidebar {
-        order: 1;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        border-top: none;
-        padding: 10px 14px;
-        gap: 10px;
-        overflow: visible;
-        background: #0d1524;
-      }
-
-      .workspace {
-        order: 2;
-        padding: 12px 14px;
-        gap: 14px;
-        overflow: visible;
-      }
-
-      /* Barra de navegación sticky: siempre accesible con un toque */
-      .main-nav-tabs {
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        background: rgba(19, 26, 38, 0.96);
-        backdrop-filter: blur(12px);
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
-        margin: -4px -4px 6px -4px;
-        padding: 6px;
-      }
-
-      .main-nav-btn {
-        min-height: 42px;
-        padding: 8px 14px;
-        font-size: 0.82rem;
-        touch-action: manipulation;
-      }
-
-      /* Botón colapsable para abrir/cerrar controles cómodamente */
-      .mobile-sidebar-toggle {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        background: #131f33;
-        border: 1.5px solid var(--primary);
-        border-radius: 10px;
-        padding: 11px 16px;
-        color: #fff;
-        cursor: pointer;
-        font-size: 0.88rem;
-        touch-action: manipulation;
-        transition: all 0.2s ease;
-        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.1);
-      }
-
-      .mobile-sidebar-toggle:hover, .mobile-sidebar-toggle:active {
-        background: #1b2942;
-        border-color: #7dd3fc;
-      }
-
-      .sidebar.mobile-expanded .mobile-sidebar-toggle {
-        background: #19263e;
-        border-color: #38bdf8;
-      }
-
-      .m-toggle-title {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--primary);
-        font-weight: 700;
-      }
-
-      .m-toggle-indicator {
-        font-size: 0.78rem;
-        color: #bae6fd;
-        font-weight: 700;
-        background: rgba(56, 189, 248, 0.18);
-        padding: 4px 10px;
-        border-radius: 6px;
-        border: 1px solid rgba(56, 189, 248, 0.35);
-      }
-
-      /* Contenido del sidebar colapsado por defecto en móvil */
-      .sidebar-content {
-        display: none;
-        margin-top: 12px;
-      }
-
-      .sidebar.mobile-expanded .sidebar-content {
-        display: flex;
-      }
-
-      /* Botón de acción rápida para cerrar controles y volver a ver el gráfico */
-      .mobile-close-controls-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        width: 100%;
-        padding: 11px 16px;
-        background: linear-gradient(135deg, #0284c7, #2563eb);
-        color: #ffffff;
-        border: 1px solid #38bdf8;
-        border-radius: 8px;
-        font-size: 0.88rem;
-        font-weight: 700;
-        cursor: pointer;
-        margin-top: 6px;
-        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-        touch-action: manipulation;
-      }
-
-      .mobile-close-controls-btn:active {
-        transform: scale(0.98);
-        background: #0284c7;
-      }
-
-      /* Botón flotante accesible desde cualquier scroll en móvil */
-      .mobile-floating-grad-btn {
-        display: none;
-        align-items: center;
-        gap: 8px;
-        position: fixed;
-        bottom: 20px;
-        right: 16px;
-        z-index: 999;
-        background: rgba(13, 22, 37, 0.95);
-        color: #fff;
-        border: 1.5px solid var(--primary);
-        border-radius: 30px;
-        padding: 10px 18px;
-        font-size: 0.82rem;
-        font-weight: 700;
-        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(56, 189, 248, 0.35);
-        cursor: pointer;
-        backdrop-filter: blur(10px);
-        transition: transform 0.2s ease, opacity 0.2s ease;
-      }
-
-      .mobile-floating-grad-btn:active {
-        transform: scale(0.96);
-      }
-
-      /* En Modo Examen, ocultar sidebar y botón flotante para concentración máxima */
-      body[data-active-tab="quiz"] .sidebar,
-      body[data-active-tab="quiz"] .mobile-floating-grad-btn {
-        display: none !important;
-      }
-
-      /* PESTAÑA 1: OJO */
-      .canvas-container {
-        height: 250px;
-      }
-
-      .top-diagnostics {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .diag-title {
-        font-size: 1.15rem;
-      }
-
-      .meridians-summary {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-
-      /* PESTAÑA 2: CRUZ ÓPTICA */
-      .cross-container {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .cross-canvas-box {
-        padding: 16px 12px;
-      }
-
-      .cross-canvas {
-        width: min(320px, 85vw);
-        height: min(320px, 85vw);
-      }
-
-      .cross-explanation {
-        padding: 16px 14px;
-      }
-
-      /* PESTAÑA 3: FRONTOFOCÓMETRO */
-      .fronto-container {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .fronto-tutorial-header {
-        grid-column: span 1;
-        padding: 14px 16px;
-      }
-
-      .fronto-step-btn {
-        min-height: 42px;
-        padding: 8px 12px;
-        touch-action: manipulation;
-      }
-
-      .fronto-view-box {
-        padding: 16px 12px;
-      }
-
-      .fronto-ocular {
-        width: min(300px, 80vw);
-        height: min(300px, 80vw);
-      }
-
-      .fronto-controls {
-        padding: 16px 14px;
-      }
-
-      .shift-pad-grid {
-        grid-template-columns: repeat(3, 46px);
-        grid-template-rows: repeat(3, 40px);
-        gap: 6px;
-      }
-
-      .pad-btn {
-        font-size: 1.05rem;
-        touch-action: manipulation;
-      }
-
-      .step-btn {
-        width: 38px;
-        height: 38px;
-        font-size: 1.25rem;
-        touch-action: manipulation;
-      }
-
-      /* PESTAÑA 4: MODO QUIZ */
-      .quiz-container {
-        padding: 18px 14px;
-        gap: 16px;
-      }
-
-      .quiz-opt-btn {
-        min-height: 48px;
-        padding: 14px 16px;
-        font-size: 0.9rem;
-        touch-action: manipulation;
-      }
-    }
-
-    /* PANTALLAS EXTRA PEQUEÑAS (SMARTPHONES <= 550px) */
-    @media (max-width: 550px) {
-      header {
-        padding: 10px 12px;
-      }
-
-      .brand {
-        gap: 8px;
-      }
-
-      .brand-icon {
-        width: 32px;
-        height: 32px;
-      }
-
-      .brand-icon svg {
-        width: 18px;
-        height: 18px;
-      }
-
-      .brand h1 {
-        font-size: 1.05rem;
-      }
-
-      .brand p {
-        display: none;
-      }
-
-      .lens-toggle {
-        padding: 6px 10px;
-        font-size: 0.74rem;
-      }
-
-      .presets-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-      }
-
-      .preset-btn {
-        padding: 6px 7px;
-        min-height: 46px;
-      }
-
-      .preset-btn .p-name {
-        font-size: 0.69rem;
-        line-height: 1.2;
-      }
-
-      .preset-btn .p-recipe {
-        font-size: 0.71rem;
-      }
-
-      .p-tag {
-        font-size: 0.58rem;
-        padding: 1px 4px;
-      }
-
-      .main-nav-btn {
-        padding: 7px 10px;
-        font-size: 0.75rem;
-      }
-
-      .canvas-container {
-        height: 230px;
-      }
-
-      .val-badge {
-        font-size: 0.88rem;
-        padding: 3px 8px;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Laboratorio de Óptica - Simulador de Refracción</title>
+  <meta name="description" content="Simulador interactivo de refracción ocular, cruz óptica TABO, visor de lente 3D CR-39 y frontofocómetro de taller para la Tecnicatura en Óptica.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500&family=Host+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="laboratorio.css">
 </head>
 <body>
+  <a class="skip" href="#mainWorkspace">Saltar al simulador</a>
 
-  <!-- ENCABEZADO -->
-  <header>
-    <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </div>
+        <div>
+          <h1>Laboratorio de Óptica</h1>
+          <p>Simulador de refracción · Tecnicatura en Óptica</p>
+        </div>
       </div>
-      <div>
-        <h1>Laboratorio de Óptica</h1>
-        <p>Simulador de refracción · Tecnicatura en Óptica</p>
+
+      <div class="top-actions">
+        <button type="button" class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-expanded="true" onclick="toggleSidebarCollapse()" title="Ocultar o mostrar panel lateral de graduación y casos">
+          <span id="sidebarToggleIcon" aria-hidden="true">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </span>
+          <span id="sidebarToggleText">Ocultar panel</span>
+        </button>
+        <label class="lens-toggle" title="Aplica la lente correctora de la receta delante del ojo">
+          <input type="checkbox" id="correctiveLensCheck">
+          <span>Lente correctora</span>
+        </label>
       </div>
-    </div>
-    
-    <div class="top-actions">
-      <button type="button" class="sidebar-toggle-btn" id="sidebarToggleBtn" onclick="toggleSidebarCollapse()" title="Ocultar o mostrar panel lateral de graduación y casos">
-        <span id="sidebarToggleIcon">◀</span>
-        <span id="sidebarToggleText">Ocultar panel</span>
-      </button>
-      <label class="lens-toggle" title="Aplica la lente correctora de la receta delante del ojo">
-        <input type="checkbox" id="correctiveLensCheck">
-        <span>Lente correctora</span>
-      </label>
     </div>
   </header>
 
   <div class="main-container">
-    
-    <!-- SIDEBAR: CONTROLES Y CASOS PREESTABLECIDOS -->
-    <aside class="sidebar" id="mainSidebar">
-      
-      <!-- BOTÓN COLAPSABLE EXCLUSIVO PARA MÓVILES -->
-      <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" aria-expanded="false">
+    <aside class="sidebar" id="mainSidebar" aria-label="Graduación y casos de estudio">
+      <button type="button" class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()" aria-expanded="false">
         <span class="m-toggle-title">
-          <svg width="18" height="18" fill="var(--primary)" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-          <strong id="mobileToggleLabel">Modificar Graduación y Casos</strong>
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><circle cx="11" cy="18" r="1.5" fill="currentColor"/></svg>
+          <strong id="mobileToggleLabel">Graduación: -2.50 esf · -1.75 cil × 45°</strong>
         </span>
-        <span class="m-toggle-indicator" id="mobileSidebarIndicator">▼ Abrir Controles</span>
+        <span class="m-toggle-indicator" id="mobileSidebarIndicator">Abrir</span>
       </button>
 
       <div class="sidebar-content" id="sidebarContent">
-        <div>
-          <label for="studyCase" class="section-title">Caso de estudio</label>
+        <div class="sidebar-block">
+          <label for="studyCase" class="control-heading">Caso de estudio</label>
           <select id="studyCase">
             <option value="" disabled>Graduación personalizada</option>
             <option value="0,0,0">Emetropía</option>
@@ -1948,111 +70,99 @@
           </select>
         </div>
 
-      <!-- CONTROLES MANUALES -->
-      <div>
-        <div class="section-title">
-          <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-          Graduación
-        </div>
+        <div class="sidebar-block">
+          <h2 class="control-heading">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><circle cx="11" cy="18" r="1.5" fill="currentColor"/></svg>
+            Graduación
+          </h2>
 
-        <div class="control-card">
-          <!-- ESFERA -->
-          <div class="input-group">
-            <div class="input-header">
-              <span>Esfera (D)</span>
-              <label class="rx-entry"><input id="sphereVal" aria-label="Esfera (D), entrada manual" inputmode="decimal" type="text" autocomplete="off" spellcheck="false"><span aria-hidden="true">D</span></label>
-            </div>
-            <div class="slider-row">
-              <button class="step-btn" aria-label="Disminuir esfera" onclick="stepVal('sphere', -0.25)">−</button>
-              <input type="range" aria-label="Esfera" id="sphereInput" min="-10.00" max="10.00" step="0.25" value="-2.50">
-              <button class="step-btn" aria-label="Aumentar esfera" onclick="stepVal('sphere', 0.25)">+</button>
-            </div>
-          </div>
-
-          <!-- CILINDRO -->
-          <div class="input-group">
-            <div class="input-header">
-              <span>Cilindro (D)</span>
-              <label class="rx-entry"><input id="cylVal" aria-label="Cilindro (D), entrada manual" inputmode="decimal" type="text" autocomplete="off" spellcheck="false"><span aria-hidden="true">D</span></label>
-            </div>
-            <div class="slider-row">
-              <button class="step-btn" aria-label="Disminuir cilindro" onclick="stepVal('cyl', -0.25)">−</button>
-              <input type="range" aria-label="Cilindro" id="cylInput" min="-8.00" max="8.00" step="0.25" value="-1.75">
-              <button class="step-btn" aria-label="Aumentar cilindro" onclick="stepVal('cyl', 0.25)">+</button>
-            </div>
-          </div>
-
-          <!-- EJE -->
-          <div class="input-group">
-            <div class="input-header">
-              <span>Eje (°)</span>
-              <label class="rx-entry"><input id="axisVal" aria-label="Eje (°), entrada manual" inputmode="numeric" type="text" autocomplete="off" spellcheck="false"><span aria-hidden="true">°</span></label>
-            </div>
-            <div class="slider-row">
-              <button class="step-btn" aria-label="Disminuir eje" onclick="stepVal('axis', -5)">−</button>
-              <input type="range" aria-label="Eje" id="axisInput" min="0" max="180" step="1" value="45">
-              <button class="step-btn" aria-label="Aumentar eje" onclick="stepVal('axis', 5)">+</button>
+          <div class="control-panel">
+            <div class="input-group">
+              <div class="input-header">
+                <label for="sphereVal">Esfera (D)</label>
+                <label class="rx-entry"><input id="sphereVal" aria-label="Esfera (D), entrada manual" inputmode="decimal" type="text" autocomplete="off" spellcheck="false"><span aria-hidden="true">D</span></label>
+              </div>
+              <div class="slider-row">
+                <button type="button" class="step-btn" aria-label="Disminuir esfera" onclick="stepVal('sphere', -0.25)">−</button>
+                <input type="range" aria-label="Esfera" id="sphereInput" min="-10.00" max="10.00" step="0.25" value="-2.50">
+                <button type="button" class="step-btn" aria-label="Aumentar esfera" onclick="stepVal('sphere', 0.25)">+</button>
+              </div>
             </div>
 
-            <div class="axis-dial-wrapper">
-              <canvas id="axisDial" class="axis-canvas" width="140" height="140"></canvas>
-              <div class="axis-info">
-                <span style="font-size: 0.76rem; color: var(--text-muted);">Meridiano 1: <strong id="m1AxisTxt" style="color: var(--m1-color)">45°</strong></span>
-                <span style="font-size: 0.76rem; color: var(--text-muted);">Meridiano 2: <strong id="m2AxisTxt" style="color: var(--m2-color)">135°</strong></span>
+            <div class="input-group">
+              <div class="input-header">
+                <label for="cylVal">Cilindro (D)</label>
+                <label class="rx-entry"><input id="cylVal" aria-label="Cilindro (D), entrada manual" inputmode="decimal" type="text" autocomplete="off" spellcheck="false"><span aria-hidden="true">D</span></label>
+              </div>
+              <div class="slider-row">
+                <button type="button" class="step-btn" aria-label="Disminuir cilindro" onclick="stepVal('cyl', -0.25)">−</button>
+                <input type="range" aria-label="Cilindro" id="cylInput" min="-8.00" max="8.00" step="0.25" value="-1.75">
+                <button type="button" class="step-btn" aria-label="Aumentar cilindro" onclick="stepVal('cyl', 0.25)">+</button>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <div class="input-header">
+                <label for="axisVal">Eje (°)</label>
+                <label class="rx-entry"><input id="axisVal" aria-label="Eje (°), entrada manual" inputmode="numeric" type="text" autocomplete="off" spellcheck="false"><span aria-hidden="true">°</span></label>
+              </div>
+              <div class="slider-row">
+                <button type="button" class="step-btn" aria-label="Disminuir eje" onclick="stepVal('axis', -5)">−</button>
+                <input type="range" aria-label="Eje" id="axisInput" min="0" max="180" step="1" value="45">
+                <button type="button" class="step-btn" aria-label="Aumentar eje" onclick="stepVal('axis', 5)">+</button>
+              </div>
+
+              <div class="axis-dial-wrapper">
+                <canvas id="axisDial" class="axis-canvas" width="140" height="140" aria-label="Transportador circular de eje TABO"></canvas>
+                <div class="axis-info">
+                  <span>Meridiano 1: <strong id="m1AxisTxt" class="axis-m1">45°</strong></span>
+                  <span>Meridiano 2: <strong id="m2AxisTxt" class="axis-m2">135°</strong></span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <button type="button" class="mobile-close-controls-btn step-btn--primary" onclick="closeMobileSidebarAndShowGraph()">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Volver al trazado</span>
+        </button>
       </div>
-
-      <!-- BOTÓN MÓVIL PARA APLICAR Y VOLVER AL GRÁFICO -->
-      <button type="button" class="mobile-close-controls-btn" onclick="closeMobileSidebarAndShowGraph()">
-        <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-        <span>Volver al trazado</span>
-      </button>
-
-      </div><!-- fin .sidebar-content -->
-
     </aside>
 
-    <!-- WORKSPACE PRINCIPAL -->
-    <main class="workspace">
+    <main class="workspace" id="mainWorkspace">
+      <div class="workspace-bar">
+        <div class="module-intro">
+          <h2 id="moduleTitle">Refracción ocular</h2>
+          <p id="modulePrompt">Ajustá la graduación y observá dónde enfoca cada meridiano.</p>
+        </div>
 
-      <!-- BARRA DE PESTAÑAS PRINCIPAL -->
-      <div class="module-intro">
-        <div><h2 id="moduleTitle">Refracción ocular</h2>
-          <p id="modulePrompt">Ajustá la graduación y observá dónde enfoca cada meridiano.</p></div>
-        <div class="optical-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+        <nav class="main-nav-tabs" aria-label="Módulos del laboratorio">
+          <button type="button" class="main-nav-btn active" aria-current="page" onclick="switchMainTab('eye')">Rayos y ojo</button>
+          <button type="button" class="main-nav-btn" onclick="switchMainTab('cross')">Cruz óptica</button>
+          <button type="button" class="main-nav-btn" onclick="switchMainTab('lensometer')">Frontofocómetro</button>
+          <button type="button" class="main-nav-btn" onclick="switchMainTab('quiz')">Autoevaluación</button>
+        </nav>
       </div>
-      <nav class="main-nav-tabs" aria-label="Módulos del laboratorio">
-        <button class="main-nav-btn active" aria-current="page" onclick="switchMainTab('eye')">Rayos y ojo</button>
-        <button class="main-nav-btn" onclick="switchMainTab('cross')">Cruz óptica</button>
-        <button class="main-nav-btn" onclick="switchMainTab('lensometer')">Frontofocómetro</button>
-        <button class="main-nav-btn" onclick="switchMainTab('quiz')">Autoevaluación</button>
-      </nav>
 
-      <!-- ================= PESTAÑA 1: RAYOS Y OJO ================= -->
+      <!-- Pestaña 1: Rayos y ojo -->
       <div class="tab-view active" id="view-eye">
-        
-        <div class="viewport-card">
+        <section class="viewport-panel" aria-labelledby="rayTracingHeading">
           <div class="viewport-header">
-            <h2 style="font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-              <svg width="18" height="18" fill="var(--primary)" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-              Trazado de rayos
-            </h2>
-
-            <div class="view-subtabs">
-              <button class="view-subtab active" id="tabCombined" onclick="setViewMode('combined')">Conoide</button>
-              <button class="view-subtab" id="tabM1" onclick="setViewMode('m1')">M1 · Eje</button>
-              <button class="view-subtab" id="tabM2" onclick="setViewMode('m2')">M2 · Contraeje</button>
+            <h3 id="rayTracingHeading">Trazado de rayos</h3>
+            <div class="view-subtabs" role="group" aria-label="Vista de meridianos">
+              <button type="button" class="view-subtab active" id="tabCombined" aria-pressed="true" onclick="setViewMode('combined')">Conoide</button>
+              <button type="button" class="view-subtab" id="tabM1" aria-pressed="false" onclick="setViewMode('m1')">Eje M1</button>
+              <button type="button" class="view-subtab" id="tabM2" aria-pressed="false" onclick="setViewMode('m2')">Eje M2</button>
             </div>
           </div>
 
           <div class="canvas-container">
             <canvas id="eyeCanvas" role="img" aria-label="Trazado de rayos del caso actual"></canvas>
           </div>
+
           <div id="lensReading" class="lens-reading" aria-live="polite" hidden>
-            <label>Mostrar
+            <label class="lens-reading-row">Mostrar
               <select id="lensDisplay">
                 <option value="result">Lente resultante</option>
                 <option value="components">Por componente de la receta</option>
@@ -2063,24 +173,75 @@
             <span id="lensPowers"></span>
             <small>Los perfiles son esquemáticos. La receta indica la potencia óptica en dioptrías. La curvatura física de cada cara depende del diseño y del material.</small>
           </div>
-          <p class="eye-reading" id="eyeReading"></p><div class="plot-caption"><span><b class="key-m1"></b>Meridiano 1</span><span><b class="key-m2"></b>Meridiano 2</span><span id="eyeSturmKey"><b class="key-cmd"></b>CMD · círculo de menor difusión</span><span id="plotState">Sin corrección</span></div>
+
+          <p class="eye-reading" id="eyeReading"></p>
+          <div class="plot-caption">
+            <span><b class="key-m1"></b>Meridiano 1</span>
+            <span><b class="key-m2"></b>Meridiano 2</span>
+            <span id="eyeSturmKey"><b class="key-cmd"></b>CMD · círculo de menor difusión</span>
+            <span id="plotState">Sin corrección</span>
+          </div>
+
           <details id="lens3d">
-            <summary>Explorar la lente en 3D · CR-39</summary>
+            <summary>Explorar la lente en 3D</summary>
             <div class="lens-controls">
-              <label>Lente <select id="solidPart"><option value="result">Resultante</option><option value="sphere">Componente esférico</option><option value="cylinder">Componente cilíndrico</option></select></label>
+              <label>Lente
+                <select id="solidPart">
+                  <option value="result">Resultante</option>
+                  <option value="sphere">Componente esférico</option>
+                  <option value="cylinder">Componente cilíndrico</option>
+                </select>
+              </label>
+              <label>Fondo
+                <select id="solidScene">
+                  <option value="chart">Cartilla de letras</option>
+                  <option value="reading">Página de lectura</option>
+                  <option value="dial">Reloj astigmático</option>
+                  <option value="grid">Cuadrícula y círculos</option>
+                  <option value="desk">Escritorio a tres distancias</option>
+                </select>
+              </label>
+              <label>Vista
+                <select id="solidMode">
+                  <option value="explore">Explorar en 3D</option>
+                  <option value="wear">Mirar con el anteojo</option>
+                </select>
+              </label>
               <button type="button" data-camera="front">Frente</button>
               <button type="button" data-camera="side">Perfil</button>
               <button type="button" data-camera="oblique">Oblicua</button>
+              <label id="solidReferenceLabel" hidden><input type="checkbox" id="solidReference"> Ver fondo original</label>
+              <button id="solidFull" type="button">Pantalla completa</button>
+            </div>
+            <details class="solid-settings">
+              <summary>Cristal y posición de uso</summary>
+              <div class="lens-controls">
+                <label>Material <select id="solidMaterial"><option value="1.498">CR-39 · 1,498</option><option value="1.586">Policarbonato · 1,586</option><option value="1.67">Alto índice · 1,67</option></select></label>
+                <label>Aro oval (mm) <select id="solidFrame"><option>40 × 30</option><option selected>44 × 32</option><option>50 × 36</option></select></label>
+                <label>Cristal a pupila (mm) <input id="solidDistance" type="number" min="10" max="22" value="15"></label>
+                <label>Inclinación vertical (°) <input id="solidTilt" type="number" min="-20" max="20" value="0"></label>
+                <label>Curvatura de la montura (°) <input id="solidWrap" type="number" min="-20" max="20" value="0"></label>
+                <label>Descentrado horizontal (mm) <input id="solidX" type="number" min="-8" max="8" value="0"></label>
+                <label>Descentrado vertical (mm) <input id="solidY" type="number" min="-8" max="8" value="0"></label>
+              </div>
+            </details>
+            <div class="lens-controls">
+              <label>Al arrastrar <select id="solidAction"><option value="rotate">Girar lente</option><option value="gaze">Señalar mirada</option><option value="move">Desplazar cristal</option></select></label>
+              <button id="solidCenter" type="button">Centrar mirada</button>
+              <button type="button" data-save="A">Guardar A</button><button type="button" data-save="B">Guardar B</button>
+              <button type="button" data-load="A" disabled>Ver A</button><button type="button" data-load="B" disabled>Ver B</button>
             </div>
             <canvas id="solidCanvas" tabindex="0" aria-label="Modelo tridimensional de la lente" aria-describedby="solidHelp solidMeasures"></canvas>
-            <small id="solidHelp">Arrastrá para girar o usá las flechas del teclado. La línea dorada marca el eje del cilindro visto desde el frente.</small>
+            <p class="lens-note" id="solidHelp">Arrastrá la lente o usá las flechas para girarla. Compará las letras dentro y fuera del cristal para ver el efecto aproximado de la graduación. La línea dorada marca el eje del cilindro.</p>
+            <p class="lens-note">El monitor muestra cambios de tamaño y proporción. Para saber con qué nitidez verías con tu receta, necesitás mirar a través de un cristal real.</p>
             <p id="solidMeasures"></p>
-            <small>CR-39 de índice 1,498. Modelo centrado en un aro oval de 44 × 32 mm, sin bisel ni inclinación de montaje. Cara anterior esférica, curva base estimada y espesor mínimo de diseño de 2 mm. Para reproducir un anteojo específico hacen falta el trazado del aro, el centrado y las superficies del fabricante. <a href="https://refractiveindex.info/download/data/2006/CR39.pdf">Ficha del CR-39 de PPG</a> · <a href="https://www.nao.org/wp-content/uploads/2020/04/Lens-Powers.pdf">Cálculo de potencia de vértice</a></small>
+            <div id="solidProfiles" hidden><p class="lens-note">Perfiles A y B a la misma escala · corte horizontal por el centro óptico</p><canvas id="profileCanvas" aria-label="Comparación de secciones horizontales"></canvas><p id="profileText" class="lens-note"></p></div>
+            <p class="lens-note">Modelo monocular de rayos principales. Cara anterior esférica, curva base estimada y espesor mínimo de diseño de 2 mm. Las medidas de fabricación dependen del diseño y del bisel. <a href="https://www.nao.org/wp-content/uploads/2020/04/Lens-Powers.pdf">Potencia de vértice</a></p>
           </details>
-        </div>
+        </section>
 
         <div class="top-diagnostics">
-          <div class="diag-box">
+          <div class="diag-panel">
             <div class="diag-label">Interpretación sin corrección</div>
             <div class="diag-title">
               <span id="diagTitle">Astigmatismo miópico compuesto</span>
@@ -2091,142 +252,136 @@
             </div>
           </div>
 
-          <div class="transposition-box">
+          <div class="transposition-panel">
             <div class="diag-label">Transposición de la receta</div>
             <div class="trans-row">
-              <span>Fórmula Actual:</span>
+              <span>Fórmula actual</span>
               <code id="transCurrent">-2.50 () -1.75 a 45°</code>
             </div>
             <div class="trans-row">
-              <span>Transpuesta:</span>
+              <span>Transpuesta</span>
               <code id="transOther">-4.25 () +1.75 a 135°</code>
             </div>
           </div>
         </div>
 
         <div class="meridians-summary">
-          <div class="meridian-card" style="border-left: 4px solid var(--m1-color);">
+          <div class="meridian-cell meridian-cell--m1">
             <div class="m-header">
-              <div class="m-dot" style="background: var(--m1-color); color: var(--m1-color);"></div>
-              <span style="color: var(--m1-color);">Meridiano 1 (a <span id="cardM1Axis">45°</span>)</span>
+              <span>Meridiano 1 (<span id="cardM1Axis">45°</span>)</span>
+              <span class="badge-status status-miope" id="cardM1Badge">Miópico</span>
             </div>
-            <div class="m-stat" id="cardM1Power" style="color: var(--m1-color);">-2.50 D</div>
-            <div class="m-status" id="cardM1Status">Enfoca por DELANTE de la retina.</div>
-            <div><span class="badge-status status-miope" id="cardM1Badge">Miópico</span></div>
+            <div class="m-stat m-stat--m1" id="cardM1Power">-2.50 D</div>
+            <div class="m-status" id="cardM1Status">Enfoca por delante de la retina.</div>
           </div>
 
-          <div class="meridian-card" style="border-left: 4px solid var(--m2-color);">
+          <div class="meridian-cell meridian-cell--m2">
             <div class="m-header">
-              <div class="m-dot" style="background: var(--m2-color); color: var(--m2-color);"></div>
-              <span style="color: var(--m2-color);">Meridiano 2 (a <span id="cardM2Axis">135°</span>)</span>
+              <span>Meridiano 2 (<span id="cardM2Axis">135°</span>)</span>
+              <span class="badge-status status-miope" id="cardM2Badge">Miópico</span>
             </div>
-            <div class="m-stat" id="cardM2Power" style="color: var(--m2-color);">-4.25 D</div>
-            <div class="m-status" id="cardM2Status">Enfoca por DELANTE de la retina.</div>
-            <div><span class="badge-status status-miope" id="cardM2Badge">Miópico</span></div>
+            <div class="m-stat m-stat--m2" id="cardM2Power">-4.25 D</div>
+            <div class="m-status" id="cardM2Status">Enfoca por delante de la retina.</div>
           </div>
 
-          <div class="meridian-card" style="border-left: 4px solid var(--cmd-color);">
+          <div class="meridian-cell meridian-cell--cmd">
             <div class="m-header">
-              <div class="m-dot" style="background: var(--cmd-color); color: var(--cmd-color);"></div>
-              <span style="color: var(--cmd-color);">Círculo Menor Difusión (CMD)</span>
+              <span>Círculo de menor difusión</span>
+              <span class="badge-status status-cmd">Promedio focal</span>
             </div>
-            <div class="m-stat" id="cardCmdPower" style="color: var(--cmd-color);">-3.38 D</div>
+            <div class="m-stat m-stat--cmd" id="cardCmdPower">-3.38 D</div>
             <div class="m-status" id="cardCmdStatus">Equivalente esférico (Esf + Cil/2). Centro del conoide.</div>
-            <div><span class="badge-status" style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid #fbbf24;">Promedio Focal</span></div>
           </div>
         </div>
 
-        <div class="clinical-card">
-          <h3>
-            <svg width="18" height="18" fill="var(--primary)" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <section class="clinical-notes" aria-labelledby="clinicalHeading">
+          <h3 id="clinicalHeading">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
             ¿Qué ocurre dentro de las estructuras oculares?
           </h3>
           <p id="clinicalDetailedText">Lectura de la graduación sin corrección</p>
-          <ul>
-            <li><span class="bullet"></span><span id="bullet1">Meridiano 1: Potencia y posición focal.</span></li>
-            <li><span class="bullet"></span><span id="bullet2">Meridiano 2: Potencia y posición focal.</span></li>
-            <li><span class="bullet"></span><span id="bullet3">Intervalo de Sturm: Separación óptica entre ambos focos.</span></li>
+          <ul class="clinical-list">
+            <li id="bullet1">Meridiano 1: potencia y posición focal.</li>
+            <li id="bullet2">Meridiano 2: potencia y posición focal.</li>
+            <li id="bullet3">Intervalo de Sturm: separación óptica entre ambos focos.</li>
           </ul>
-        </div>
-
+        </section>
       </div>
 
-      <!-- ================= PESTAÑA 2: CRUZ ÓPTICA ================= -->
+      <!-- Pestaña 2: Cruz óptica -->
       <div class="tab-view" id="view-cross">
         <div class="cross-container">
           <div class="cross-canvas-box">
-            <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff;">Diagrama en Cruz Óptica</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
-              Representación ortogonal de potencias según la notación estándar internacional TABO.
-            </p>
-            <canvas id="crossCanvas" class="cross-canvas" width="680" height="680"></canvas>
+            <h3>Diagrama en Cruz Óptica</h3>
+            <p class="cross-subtitle">Representación ortogonal de potencias según la notación estándar internacional TABO.</p>
+            <div class="cross-dial-well">
+              <canvas id="crossCanvas" class="cross-canvas" width="680" height="680" aria-label="Diagrama circular en cruz óptica TABO"></canvas>
+            </div>
           </div>
 
           <div class="cross-explanation">
-            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">Desglose Oftálmico de la Cruz</h3>
-            
-            <div class="cross-step">
-              <strong>1. Meridiano de la Esfera pura:</strong>
-              <div id="crossStep1" style="margin-top: 4px; color: #cbd5e1;">A 45° la lente solo tiene la potencia esférica: -2.50 D.</div>
-            </div>
-
-            <div class="cross-step">
-              <strong>2. Meridiano de la Potencia Total:</strong>
-              <div id="crossStep2" style="margin-top: 4px; color: #cbd5e1;">A 135° actúa la Esfera + Cilindro: -2.50 + (-1.75) = -4.25 D.</div>
-            </div>
-
-            <div class="cross-step">
-              <strong>3. Descomposición en Dos Cilindros Cruzados:</strong>
-              <div id="crossStep3" style="margin-top: 4px; color: #cbd5e1; font-family: monospace;">
-                Cil. -2.50 D a 135° (+) Cil. -4.25 D a 45°
+            <h3>Desglose Oftálmico de la Cruz</h3>
+            <div class="cross-steps-list">
+              <div class="cross-step">
+                <strong>1. Meridiano de la esfera pura</strong>
+                <div class="cross-step-body" id="crossStep1">A 45° la lente solo tiene la potencia esférica: -2.50 D.</div>
               </div>
-            </div>
-
-            <div class="cross-step">
-              <strong>4. Transposición paso a paso:</strong>
-              <div id="crossStep4" style="margin-top: 4px; color: #cbd5e1; line-height: 1.6;">
-                • Nueva Esfera = Esf + Cil = -4.25 D<br>
-                • Nuevo Cilindro = Signo opuesto (+1.75 D)<br>
-                • Nuevo Eje = 45° + 90° = 135°
+              <div class="cross-step">
+                <strong>2. Meridiano de la potencia total</strong>
+                <div class="cross-step-body" id="crossStep2">A 135° actúa la esfera más el cilindro: -2.50 + (-1.75) = -4.25 D.</div>
+              </div>
+              <div class="cross-step">
+                <strong>3. Descomposición en dos cilindros cruzados</strong>
+                <div class="cross-step-body cross-step-body--mono" id="crossStep3">Cil. -2.50 D a 135° (+) Cil. -4.25 D a 45°</div>
+              </div>
+              <div class="cross-step">
+                <strong>4. Transposición paso a paso</strong>
+                <div class="cross-step-body" id="crossStep4">
+                  <ul class="trans-steps">
+                    <li>Nueva esfera = Esf + Cil = -4.25 D</li>
+                    <li>Nuevo cilindro = Signo opuesto (+1.75 D)</li>
+                    <li>Nuevo eje = 45° + 90° = 135°</li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-
-      <!-- ================= PESTAÑA 4: FRONTOFOCÓMETRO DIDÁCTICO ================= -->
+      <!-- Pestaña 3: Frontofocómetro -->
       <div class="tab-view" id="view-lensometer">
-        
-        <!-- GUÍA PASO A PASO INTERACTIVA COMPACTA -->
         <div class="fronto-tutorial-header" id="frontoTutorialHeaderElem">
           <div class="fronto-tutorial-bar">
             <div class="fronto-tutorial-left">
               <button type="button" class="fronto-guide-toggle-btn" id="frontoGuideToggleBtn" aria-expanded="false" aria-controls="frontoStepExplanation" onclick="toggleFrontoTutorialGuide()" title="Desplegar u ocultar la guía teórica paso a paso">
-                <span id="frontoGuideIcon">📖</span>
-                <strong>Guía Tutorial</strong>
-                <span id="frontoGuideArrow">▾</span>
+                <span id="frontoGuideIcon" aria-hidden="true">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                </span>
+                <span>Guía tutorial</span>
+                <span id="frontoGuideArrow" aria-hidden="true">
+                  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
               </button>
 
-              <!-- Barra de pasos compactos -->
               <div class="fronto-step-bar">
-                <button class="fronto-step-btn active" id="fstep1" onclick="setFrontoTutorialStep(1)" title="Preparar el ocular y comprobar el cero">
+                <button type="button" class="fronto-step-btn active" id="fstep1" onclick="setFrontoTutorialStep(1)" title="Preparar el ocular y comprobar el cero">
                   <span class="step-num">1</span>
                   <span>Enfocar ocular</span>
                 </button>
-                <button class="fronto-step-btn" id="fstep2" onclick="setFrontoTutorialStep(2)" title="Paso 2: Centrar Centro Óptico de la Lente">
+                <button type="button" class="fronto-step-btn" id="fstep2" onclick="setFrontoTutorialStep(2)" title="Paso 2: Centrar centro óptico de la lente">
                   <span class="step-num">2</span>
                   <span>Centrar</span>
                 </button>
-                <button class="fronto-step-btn" id="fstep3" onclick="setFrontoTutorialStep(3)" title="Paso 3: Enfocar Mira Esférica (3 líneas finas)">
+                <button type="button" class="fronto-step-btn" id="fstep3" onclick="setFrontoTutorialStep(3)" title="Paso 3: Enfocar mira esférica (3 líneas finas)">
                   <span class="step-num">3</span>
                   <span>Primer foco</span>
                 </button>
-                <button class="fronto-step-btn" id="fstep4" onclick="setFrontoTutorialStep(4)" title="Paso 4: Alinear Eje (Unir líneas partidas)">
+                <button type="button" class="fronto-step-btn" id="fstep4" onclick="setFrontoTutorialStep(4)" title="Paso 4: Alinear eje (unir líneas partidas)">
                   <span class="step-num">4</span>
                   <span>Alinear eje</span>
                 </button>
-                <button class="fronto-step-btn" id="fstep5" onclick="setFrontoTutorialStep(5)" title="Paso 5: Enfocar Mira Cilíndrica (2 líneas gruesas)">
+                <button type="button" class="fronto-step-btn" id="fstep5" onclick="setFrontoTutorialStep(5)" title="Paso 5: Enfocar mira cilíndrica">
                   <span class="step-num">5</span>
                   <span>Segundo foco</span>
                 </button>
@@ -2234,85 +389,67 @@
             </div>
 
             <div class="fronto-tutorial-right">
-              <button class="step-btn" style="width: auto; padding: 5px 12px; font-size: 0.74rem; background: var(--primary); color: #000; font-weight: 700;" id="demoPlay" onclick="autoRunFrontoDemo()" title="Simular la medición secuencial completa automáticamente">
+              <button type="button" class="step-btn step-btn--primary step-btn--sm" id="demoPlay" onclick="autoRunFrontoDemo()" title="Simular la medición secuencial completa automáticamente">
                 Iniciar demostración
               </button>
             </div>
           </div>
 
-          <div class="demo-actions"><button class="step-btn" onclick="showFrontoStep()">Mostrar este paso</button>
-              <label><input type="checkbox" id="focusAssist" onchange="drawFrontoCanvas()"> Realzar el foco</label></div>
-          <!-- Explicación del paso actual (desplegable) -->
-          <div id="frontoStepExplanation" class="cross-step fronto-step-drawer collapsed" style="border-left: 4px solid var(--primary); background: #0c1422;">
-            <!-- Texto dinámico por JS -->
+          <div class="demo-actions">
+            <button type="button" class="step-btn step-btn--sm" onclick="showFrontoStep()">Mostrar este paso</button>
+            <label><input type="checkbox" id="focusAssist" onchange="drawFrontoCanvas()"> Realzar el foco</label>
           </div>
+
+          <div id="frontoStepExplanation" class="fronto-step-drawer collapsed"></div>
         </div>
 
         <div class="fronto-container" id="frontoContainerElem">
-          
-          <!-- BARRA SUPERIOR DE HERRAMIENTAS DE BANCO ÓPTICO -->
           <div class="fronto-header-toolbar">
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <!-- Modo montura -->
-              <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Modo:</span>
+            <div class="fronto-toolbar-group">
+              <div class="fronto-toolbar-pair">
+                <span class="toolbar-label">Modo</span>
                 <div class="fronto-mode-segmented">
-                  <button class="fronto-mode-btn active" id="btnModeUnmounted" onclick="setFrontoLensMode('unmounted')">
-                    ⚪ Lente
-                  </button>
-                  <button class="fronto-mode-btn" id="btnModeOD" onclick="setFrontoLensMode('frame_od')">
-                    👓 OD
-                  </button>
-                  <button class="fronto-mode-btn" id="btnModeOS" onclick="setFrontoLensMode('frame_os')">
-                    👓 OI
-                  </button>
+                  <button type="button" class="fronto-mode-btn active" id="btnModeUnmounted" onclick="setFrontoLensMode('unmounted')">Lente</button>
+                  <button type="button" class="fronto-mode-btn" id="btnModeOD" onclick="setFrontoLensMode('frame_od')">OD</button>
+                  <button type="button" class="fronto-mode-btn" id="btnModeOS" onclick="setFrontoLensMode('frame_os')">OI</button>
                 </div>
               </div>
 
-              <!-- Modo Taller / Práctica a Ciegas -->
-              <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Práctica:</span>
+              <div class="fronto-toolbar-pair">
+                <span class="toolbar-label">Práctica</span>
                 <div class="fronto-pill-segmented">
-                  <button class="fronto-pill-btn active" id="btnPracticeDemo" onclick="setFrontoPracticeMode('demo')" title="Modo didáctico con receta visible">📖 Demo</button>
-                  <button class="fronto-pill-btn" id="btnPracticeGuided" onclick="setFrontoPracticeMode('guided')">Práctica guiada</button>
-                  <button class="fronto-pill-btn" id="btnPracticeBlind" onclick="setFrontoPracticeMode('blind')" title="Modo Taller a Ciegas: mide una lente incógnita sin conocer la graduación">🕶️ Examen Taller</button>
+                  <button type="button" class="fronto-pill-btn active" id="btnPracticeDemo" onclick="setFrontoPracticeMode('demo')" title="Modo didáctico con receta visible">Demo</button>
+                  <button type="button" class="fronto-pill-btn" id="btnPracticeGuided" onclick="setFrontoPracticeMode('guided')">Práctica guiada</button>
+                  <button type="button" class="fronto-pill-btn" id="btnPracticeBlind" onclick="setFrontoPracticeMode('blind')" title="Modo Taller a Ciegas: mide una lente incógnita sin conocer la graduación">Examen taller</button>
                 </div>
               </div>
-
-
             </div>
 
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <button class="fronto-audio-btn" id="frontoAudioToggleBtn" onclick="toggleFrontoAudio()" title="Activar/Silenciar sonidos mecánicos de taller">
-                <span id="frontoAudioIcon">🔊</span>
-                <span id="frontoAudioTxt">Audio</span>
+            <div class="fronto-toolbar-pair">
+              <button type="button" class="fronto-audio-btn" id="frontoAudioToggleBtn" aria-pressed="true" onclick="toggleFrontoAudio()" title="Activar o silenciar sonidos mecánicos de taller">
+                <span id="frontoAudioIcon" aria-hidden="true">
+                  <svg class="ico ico-audio-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                  <svg class="ico ico-audio-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
+                </span>
+                <span id="frontoAudioTxt">Audio activo</span>
               </button>
-              <button class="fronto-fs-btn" id="frontoFsBtn" onclick="toggleFrontoFullscreen()" title="Alternar Modo Pantalla Completa Inmersivo">
-                <span id="frontoFsIcon">⛶</span>
-                <span id="frontoFsTxt">Pantalla Completa</span>
+              <button type="button" class="fronto-fs-btn" id="frontoFsBtn" onclick="toggleFrontoFullscreen()" title="Alternar modo pantalla completa inmersivo">
+                <span id="frontoFsIcon" aria-hidden="true">
+                  <svg class="ico ico-fs-enter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/></svg>
+                  <svg class="ico ico-fs-exit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6"/><path d="M20 10h-6V4"/><path d="m14 10 7-7"/><path d="m3 21 7-7"/></svg>
+                </span>
+                <span id="frontoFsTxt">Pantalla completa</span>
               </button>
             </div>
           </div>
 
-          <!-- LADO IZQUIERDO: OCULAR Y MARCADOR -->
           <div class="fronto-view-box">
-            <!-- SELECTOR DE TIPO DE MIRA (3 OPCIONES) -->
             <div class="fronto-target-switch">
-              <button class="target-btn active" id="btnTargetCross3x2" onclick="setFrontoTargetType('cross_3x2')" title="Mira clásica Reichert / Marco: 3 líneas finas para esfera y 2 líneas gruesas para cilindro">
-                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/></svg>
-                Cruz 3 × 2
-              </button>
-              <button class="target-btn" id="btnTargetCross3x3" onclick="setFrontoTargetType('cross_3x3')" title="Patrón didáctico: 3 finas x 3 gruesas">
-                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/></svg>
-                Cruz 3 × 3
-              </button>
-              <button class="target-btn" id="btnTargetDots" onclick="setFrontoTargetType('dots')" title="Mira europea de corona de 16 puntos">
-                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><circle cx="17.66" cy="6.34" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="17.66" cy="17.66" r="2"/><circle cx="12" cy="20" r="2"/><circle cx="6.34" cy="17.66" r="2"/><circle cx="4" cy="12" r="2"/><circle cx="6.34" cy="6.34" r="2"/></svg>
-                Corona Puntos
-              </button>
+              <button type="button" class="target-btn active" id="btnTargetCross3x2" onclick="setFrontoTargetType('cross_3x2')" title="Mira clásica Reichert / Marco: 3 líneas finas para esfera y 2 líneas gruesas para cilindro">Cruz 3 × 2</button>
+              <button type="button" class="target-btn" id="btnTargetCross3x3" onclick="setFrontoTargetType('cross_3x3')" title="Patrón didáctico: 3 finas × 3 gruesas">Cruz 3 × 3</button>
+              <button type="button" class="target-btn" id="btnTargetDots" onclick="setFrontoTargetType('dots')" title="Mira europea de corona de 16 puntos">Corona puntos</button>
             </div>
 
-            <!-- CHASSIS DEL OCULAR ÓPTICO REALISTA -->
             <div class="fronto-eyepiece-housing">
               <div class="fronto-ocular" id="frontoOcularElem" title="Arrastra la lente con el ratón o dedo para centrarla">
                 <canvas aria-label="Campo óptico con retícula, escala prismática y miras" id="frontoCanvas" class="fronto-canvas" width="680" height="680"></canvas>
@@ -2320,372 +457,320 @@
             </div>
 
             <div class="fronto-mobile-controls">
-              <div><span>Potencia</span><button aria-label="Disminuir potencia" aria-label="Disminuir potencia 0.125" onclick="stepFrontoDrum(-0.125)">−</button><output id="mobilePower"></output><button aria-label="Aumentar potencia" aria-label="Aumentar potencia 0.125" onclick="stepFrontoDrum(0.125)">+</button></div>
-              <div><span>Eje</span><button aria-label="Disminuir eje" aria-label="Disminuir eje 1" onclick="stepFrontoAxis(-1)">−</button><output id="mobileAxis"></output><button aria-label="Aumentar eje" aria-label="Aumentar eje 1" onclick="stepFrontoAxis(1)">+</button></div>
+              <div><span>Potencia</span><button type="button" aria-label="Disminuir potencia 0.125" onclick="stepFrontoDrum(-0.125)">−</button><output id="mobilePower"></output><button type="button" aria-label="Aumentar potencia 0.125" onclick="stepFrontoDrum(0.125)">+</button></div>
+              <div><span>Eje</span><button type="button" aria-label="Disminuir eje 1" onclick="stepFrontoAxis(-1)">−</button><output id="mobileAxis"></output><button type="button" aria-label="Aumentar eje 1" onclick="stepFrontoAxis(1)">+</button></div>
             </div>
-            <button class="step-btn capture-next" id="captureNext" onclick="captureNextReading()">Registrar P1 y eje</button>
-            <details class="bench-detail" open><summary>Vista lateral del banco</summary>
+            <button type="button" class="step-btn step-btn--primary capture-next" id="captureNext" onclick="captureNextReading()">Registrar P1 y eje</button>
+
+            <div class="fronto-quick-actions">
+              <button type="button" class="step-btn step-btn--sm demo-only" onclick="centerFrontoLens()">Centrar lente</button>
+              <button type="button" class="step-btn step-btn--sm btn-mark" id="btnFrontoMark" onclick="triggerPhysicalMarking()">Marcar 3 puntos</button>
+              <button type="button" class="step-btn step-btn--sm" onclick="resetFrontoControls()">Reiniciar mandos</button>
+              <button type="button" class="step-btn step-btn--sm" id="requestHint" onclick="frontoState.hint=true;drawFrontoCanvas()">Pedir pista</button>
+            </div>
+
+            <div role="status" id="frontoStatusAlert" class="fronto-badge-alert">
+              Ajustá el tambor de potencias y el transportador de eje para enfocar.
+            </div>
+
+            <div class="eyepiece-calib-box">
+              <span class="calib-label">Enfoque ocular <strong id="eyepiecePowerVal">0.00 D</strong></span>
+              <div class="calib-controls">
+                <button type="button" class="drum-fine-btn" aria-label="Disminuir enfoque del ocular 0.5" onclick="stepEyepieceCalib(-0.5)">−</button>
+                <input type="range" aria-label="Enfoque del ocular" id="eyepieceCalibInput" min="-3.00" max="3.00" step="0.25" value="0" oninput="setEyepieceCalib(parseFloat(this.value))">
+                <button type="button" class="drum-fine-btn" aria-label="Aumentar enfoque del ocular 0.5" onclick="stepEyepieceCalib(0.5)">+</button>
+              </div>
+            </div>
+
+            <div class="fronto-clamp-box">
+              <button type="button" class="step-btn step-btn--sm btn-clamp" id="btnClampToggle" data-clamped="false" onclick="toggleFrontoClamp()">Bajar pinza</button>
+              <div class="table-height-row">
+                <span>Mesa</span>
+                <input type="range" aria-label="Altura de la mesa" id="frontoTableHeightInput" min="0" max="30" step="1" value="0" oninput="setFrontoTableHeight(parseInt(this.value, 10))" title="Regula la altura de la regla apoyagafas">
+                <span id="frontoTableHeightTxt" class="table-height-val">0 mm</span>
+              </div>
+            </div>
+
+            <details class="bench-detail" open>
+              <summary>Vista lateral del banco</summary>
               <canvas id="benchDiagram" width="600" height="188" aria-label="Esquema lateral del apoyo, lente, pinza, mesa y marcador"></canvas>
               <span id="benchState"></span>
-              <button class="step-btn" id="loadLens" onclick="toggleBenchLens()">Retirar lente</button>
+              <button type="button" class="step-btn step-btn--sm" id="loadLens" onclick="toggleBenchLens()">Retirar lente</button>
             </details>
-            <!-- CONTROLES DE MECÁNICA DE BANCO: PINZA Y MESA APOYAGAFAS -->
-            <div class="fronto-clamp-box">
-              <button class="step-btn" id="btnClampToggle" style="width: auto; padding: 6px 14px; font-size: 0.78rem; background: #1e293b; color: #38bdf8;" onclick="toggleFrontoClamp()">
-                🔓 Bajar Pinza de Sujeción
-              </button>
-              <div style="display: flex; align-items: center; gap: 8px; font-size: 0.76rem; color: var(--text-muted);">
-                <span>Mesa Apoyagafas:</span>
-                <input type="range" aria-label="Altura de la mesa" id="frontoTableHeightInput" min="0" max="30" step="1" value="0" style="width: 80px; accent-color: #38bdf8;" oninput="setFrontoTableHeight(parseInt(this.value, 10))" title="Regula la altura de la regla apoyagafas">
-                <span id="frontoTableHeightTxt" style="font-family: monospace; color: #fff; width: 34px;">0 mm</span>
-              </div>
-            </div>
-
-            <!-- CALIBRACIÓN DE ENFOQUE DEL OCULAR (PASO 1 OFICIAL) -->
-            <div class="eyepiece-calib-box">
-              <span style="font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 6px;">
-                🔍 Enfoque Ocular: <strong id="eyepiecePowerVal" style="color: var(--primary);">0.00 D</strong>
-              </span>
-              <div style="display: flex; align-items: center; gap: 5px;">
-                <button class="drum-fine-btn" aria-label="Disminuir enfoque del ocular 0.5" onclick="stepEyepieceCalib(-0.5)">−</button>
-                <input type="range" aria-label="Enfoque del ocular" id="eyepieceCalibInput" min="-3.00" max="3.00" step="0.25" value="0" style="width: 85px; accent-color: var(--primary);" oninput="setEyepieceCalib(parseFloat(this.value))">
-                <button class="drum-fine-btn" aria-label="Aumentar enfoque del ocular 0.5" onclick="stepEyepieceCalib(0.5)">+</button>
-
-              </div>
-            </div>
-
-            <!-- Botones directos bajo el ocular -->
-            <div style="display: flex; gap: 8px; width: 100%; justify-content: center; flex-wrap: wrap;">
-              <button class="step-btn demo-only" style="width: auto; padding: 7px 14px; font-size: 0.78rem;" onclick="centerFrontoLens()">
-                🎯 Centrar Lente
-              </button>
-              <button class="step-btn" id="btnFrontoMark" style="width: auto; padding: 7px 14px; font-size: 0.78rem; background: #7c2d12; color: #ffedd5; border: 1px solid #ea580c;" onclick="triggerPhysicalMarking()">
-                🖊️ Bajar Marcador (3 Puntos)
-              </button>
-              <button class="step-btn" style="width: auto; padding: 7px 14px; font-size: 0.78rem;" onclick="resetFrontoControls()">
-                🔄 Reiniciar Mandos
-              </button>
-            </div>
-
-            <button class="step-btn" id="requestHint" onclick="frontoState.hint=true;drawFrontoCanvas()">Pedir pista</button>
-            <!-- Badge de estado de las miras -->
-            <div role="status" id="frontoStatusAlert" class="fronto-badge-alert" style="width: 100%; background: rgba(56, 189, 248, 0.15); border: 1px solid var(--primary); color: #7dd3fc;">
-              ℹ️ Ajusta el tambor de potencias y el transportador de eje para enfocar.
-            </div>
           </div>
 
-          <!-- LADO DERECHO: MANDOS FÍSICOS DEL FRONTOFOCÓMETRO -->
           <div class="fronto-controls">
-            <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--primary); display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="fronto-controls-head">
               <span>Mandos de Taller Óptico</span>
-              <span title="Referencia visual: Reichert ML1, mira de líneas cruzadas con iluminación verde" id="frontoReticleZoom" style="font-size: 0.74rem; color: #4ade80; font-family: monospace; font-weight: 500;">
-                Retícula: Anillos 1Δ a 5Δ
-              </span>
+              <span title="Referencia visual: Reichert ML1, mira de líneas cruzadas con iluminación verde" id="frontoReticleZoom" class="reticle-note">Retícula: Anillos 1Δ a 5Δ</span>
             </h3>
-            
-            <!-- MANDO 1: TAMBOR CILÍNDRICO ANALÓGICO 3D (POWER DRUM) -->
+
             <div class="drum-control">
               <div class="input-header">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <strong style="color: #fff;">1. Tambor de potencias</strong>
-                </span>
+                <span>1. Tambor de potencias</span>
                 <span class="val-badge" id="frontoDrumVal">-2.50 D</span>
               </div>
-              
-              <!-- WIDGET CILÍNDRICO 3D INTERACTIVO -->
+
               <div class="fronto-drum-3d-wrap">
-                <canvas id="frontoDrumCanvas" class="fronto-drum-canvas" width="280" height="110" title="Usa la rueda del ratón o arrastra verticalmente para girar el tambor"></canvas>
+                <canvas id="frontoDrumCanvas" class="fronto-drum-canvas" width="280" height="110" aria-label="Tambor cilíndrico graduado de potencias en dioptrías" title="Usa la rueda del ratón o arrastra verticalmente para girar el tambor"></canvas>
                 <div class="fronto-drum-hint">
-                  <span>🖱️ Rueda de ratón / Arrastre vertical</span>
-                  <span>•</span>
+                  <span>Rueda del ratón o arrastre vertical</span>
                   <span>Lente de lectura analógica</span>
                 </div>
               </div>
 
-              <!-- Pasos finos estilo tambor de taller -->
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+              <div class="drum-actions-row">
                 <div class="drum-fine-btns">
-                  <span style="font-size: 0.7rem; color: var(--text-muted); align-self: center; margin-right: 4px;">Paso fino:</span>
-                  <button class="drum-fine-btn" aria-label="Disminuir potencia 0.125" onclick="stepFrontoDrum(-0.125)">−0,125</button>
-                  <button class="drum-fine-btn" aria-label="Aumentar potencia 0.125" onclick="stepFrontoDrum(0.125)">+0,125</button>
-                  <button class="drum-fine-btn" aria-label="Disminuir potencia 1.00" onclick="stepFrontoDrum(-1.00)">-1.00</button>
-                  <button class="drum-fine-btn" aria-label="Aumentar potencia 1.00" onclick="stepFrontoDrum(1.00)">+1.00</button>
+                  <span class="fine-prefix">Paso</span>
+                  <button type="button" class="drum-fine-btn" aria-label="Disminuir potencia 0.125" onclick="stepFrontoDrum(-0.125)">−0,125</button>
+                  <button type="button" class="drum-fine-btn" aria-label="Aumentar potencia 0.125" onclick="stepFrontoDrum(0.125)">+0,125</button>
+                  <button type="button" class="drum-fine-btn" aria-label="Disminuir potencia 1.00" onclick="stepFrontoDrum(-1.00)">−1.00</button>
+                  <button type="button" class="drum-fine-btn" aria-label="Aumentar potencia 1.00" onclick="stepFrontoDrum(1.00)">+1.00</button>
                 </div>
-                <div style="display: flex; gap: 6px;">
-                  <button class="step-btn demo-only" style="width: auto; padding: 4px 9px; font-size: 0.72rem;" onclick="setFrontoDrum(state.sphere)">➔ Foco Esf (P1)</button>
-                  <button class="step-btn demo-only" style="width: auto; padding: 4px 9px; font-size: 0.72rem;" onclick="setFrontoDrum(state.sphere + state.cyl)">➔ Foco Cil (P2)</button>
+                <div class="demo-shortcut-row">
+                  <button type="button" class="step-btn step-btn--sm demo-only" onclick="setFrontoDrum(state.sphere)">Foco Esf (P1)</button>
+                  <button type="button" class="step-btn step-btn--sm demo-only" onclick="setFrontoDrum(state.sphere + state.cyl)">Foco Cil (P2)</button>
                 </div>
               </div>
             </div>
 
-            <!-- MANDO 2: TAMBOR DE EJE (TRANSPORTADOR DE GRADOS) -->
             <div class="drum-control" id="frontoAxisWrap">
               <div class="input-header">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <strong style="color: #fff;">2. Tambor de Eje (Transportador TABO):</strong>
-                </span>
+                <span>2. Tambor de eje (TABO)</span>
                 <span class="val-badge" id="frontoAxisVal">45°</span>
               </div>
               <div class="slider-row">
-                <button class="step-btn" aria-label="Disminuir eje 5" onclick="stepFrontoAxis(-5)">−</button>
+                <button type="button" class="step-btn" aria-label="Disminuir eje 5" onclick="stepFrontoAxis(-5)">−</button>
                 <input type="range" aria-label="Eje del tambor" id="frontoAxisInput" min="0" max="180" step="1" value="45">
-                <button class="step-btn" aria-label="Aumentar eje 5" onclick="stepFrontoAxis(5)">+</button>
+                <button type="button" class="step-btn" aria-label="Aumentar eje 5" onclick="stepFrontoAxis(5)">+</button>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+              <div class="drum-actions-row">
                 <div class="drum-fine-btns">
-                  <span style="font-size: 0.7rem; color: var(--text-muted); align-self: center; margin-right: 4px;">Paso fino:</span>
-                  <button class="drum-fine-btn" aria-label="Disminuir eje 1" onclick="stepFrontoAxis(-1)">-1°</button>
-                  <button class="drum-fine-btn" aria-label="Aumentar eje 1" onclick="stepFrontoAxis(1)">+1°</button>
-                  <button class="drum-fine-btn" aria-label="Disminuir eje 15" onclick="stepFrontoAxis(-15)">-15°</button>
-                  <button class="drum-fine-btn" aria-label="Aumentar eje 15" onclick="stepFrontoAxis(15)">+15°</button>
+                  <span class="fine-prefix">Paso</span>
+                  <button type="button" class="drum-fine-btn" aria-label="Disminuir eje 1" onclick="stepFrontoAxis(-1)">−1°</button>
+                  <button type="button" class="drum-fine-btn" aria-label="Aumentar eje 1" onclick="stepFrontoAxis(1)">+1°</button>
+                  <button type="button" class="drum-fine-btn" aria-label="Disminuir eje 15" onclick="stepFrontoAxis(-15)">−15°</button>
+                  <button type="button" class="drum-fine-btn" aria-label="Aumentar eje 15" onclick="stepFrontoAxis(15)">+15°</button>
                 </div>
-                <button class="step-btn demo-only" style="width: auto; padding: 4px 10px; font-size: 0.74rem;" onclick="alignFrontoAxis()">➔ Alinear al Eje de la Lente</button>
+                <button type="button" class="step-btn step-btn--sm demo-only" onclick="alignFrontoAxis()">Alinear al eje</button>
               </div>
             </div>
 
-            <!-- RESULTADO FINAL Y CÁLCULO (ELEVADO PARA FLUJO DIRECTO) -->
-            <div class="cross-step" style="border: 1px solid var(--border-light); background: #0c1424;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <strong style="color: var(--primary);">Fórmula Calculada en el Banco:</strong>
-                <span id="blindModeBadge" style="display: none; font-size: 0.72rem; padding: 2px 8px; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; font-weight: 700;">🕶️ Lente Incógnita Activa</span>
+            <div class="drum-control formula-panel">
+              <div class="formula-head">
+                <strong>Fórmula calculada en el banco</strong>
+                <span id="blindModeBadge" class="blind-mode-pill">Lente incógnita activa</span>
               </div>
 
-              <!-- Modo Normal Didáctico -->
               <div id="frontoCalcNormArea">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; font-size: 0.84rem;">
-                  <div>1ª Lectura (Esfera P1): <strong id="calcP1Txt" style="color: #38bdf8;">-2.50 D</strong></div>
-                  <div>2ª Lectura (P2): <strong id="calcP2Txt" style="color: #f43f5e;">-4.25 D</strong></div>
-                  <div>Cilindro (P2 − P1): <strong id="calcCylTxt" style="color: #fbbf24;">-1.75 D</strong></div>
-                  <div>Eje transportador: <strong id="calcAxisTxt" style="color: #4ade80;">45°</strong></div>
+                <div class="calc-grid">
+                  <div>1ª Lectura (P1): <strong id="calcP1Txt" class="state-m1">-2.50 D</strong></div>
+                  <div>2ª Lectura (P2): <strong id="calcP2Txt" class="state-m2">-4.25 D</strong></div>
+                  <div>Cilindro (P2 − P1): <strong id="calcCylTxt" class="state-cmd">-1.75 D</strong></div>
+                  <div>Eje transportador: <strong id="calcAxisTxt" class="state-ok">45°</strong></div>
                 </div>
-                <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); font-size: 0.88rem;">
-                  Receta final obtenida: <code id="calcRecipeTxt" style="font-size: 1rem; color: #38bdf8; font-weight: 800;">-2.50 ( ) -1.75 a 45°</code>
+                <div class="calc-recipe-row">
+                  Receta final obtenida: <code id="calcRecipeTxt">-2.50 ( ) -1.75 a 45°</code>
                 </div>
               </div>
 
-              <!-- Panel Interactivo de Modo Taller a Ciegas (Examen de 2 Lecturas) -->
-              <div id="frontoBlindArea" style="display: none; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-                <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 10px; line-height: 1.4;">
-                  Realiza las dos lecturas focales en los tambores para deducir la fórmula completa de la lente incógnita:
-                </div>
+              <div id="frontoBlindArea" class="fronto-blind-area">
+                <p class="blind-intro">Realizá las dos lecturas focales en los tambores para deducir la fórmula completa de la lente incógnita.</p>
 
-                <!-- PASO 1: LECTURA 1 (P1 y EJE) -->
-                <div class="blind-reading-card" id="cardBlindP1" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #38bdf8;">1ª Lectura (Esfera P1 y eje):</span>
-                    <span id="badgeBlindP1" style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); font-weight: 600;">⏳ Pendiente</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                    <div style="font-size: 0.8rem; color: #cbd5e1;">
-                      Valor capturado: <strong id="valBlindP1Txt" style="color: #38bdf8; font-family: monospace;">--- D a ---°</strong>
+                <div class="blind-capture-list">
+                  <div class="blind-reading-row" id="cardBlindP1">
+                    <div class="blind-reading-top">
+                      <span class="state-m1">1ª Lectura (Esfera P1 y eje)</span>
+                      <span id="badgeBlindP1" class="blind-badge" data-state="pending">Pendiente</span>
                     </div>
-                    <button class="step-btn" id="btnRecordP1" style="width: auto; padding: 5px 11px; font-size: 0.76rem; background: #0284c7; color: #fff; font-weight: 700;" onclick="recordBlindReading1()">
-                      📌 Tomar 1ª Lectura
-                    </button>
-                  </div>
-                </div>
-
-                <!-- PASO 2: LECTURA 2 (P2) -->
-                <div class="blind-reading-card" id="cardBlindP2" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 8px;">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <span style="font-size: 0.8rem; font-weight: 700; color: #f43f5e;">2ª Lectura (2º Meridiano P2):</span>
-                    <span id="badgeBlindP2" style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; background: rgba(234, 179, 8, 0.15); color: #fde047; border: 1px solid rgba(234, 179, 8, 0.3); font-weight: 600;">⏳ Pendiente</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
-                    <div style="font-size: 0.8rem; color: #cbd5e1;">
-                      Valor capturado: <strong id="valBlindP2Txt" style="color: #f43f5e; font-family: monospace;">--- D</strong>
+                    <div class="blind-reading-actions">
+                      <span>Valor capturado: <strong id="valBlindP1Txt" class="state-m1">--- D a ---°</strong></span>
+                      <button type="button" class="step-btn step-btn--sm step-btn--primary" id="btnRecordP1" onclick="recordBlindReading1()">Tomar 1ª lectura</button>
                     </div>
-                    <button class="step-btn" id="btnRecordP2" style="width: auto; padding: 5px 11px; font-size: 0.76rem; background: #be123c; color: #fff; font-weight: 700;" onclick="recordBlindReading2()">
-                      📌 Tomar 2ª Lectura
-                    </button>
+                  </div>
+
+                  <div class="blind-reading-row" id="cardBlindP2">
+                    <div class="blind-reading-top">
+                      <span class="state-m2">2ª Lectura (2º meridiano P2)</span>
+                      <span id="badgeBlindP2" class="blind-badge" data-state="pending">Pendiente</span>
+                    </div>
+                    <div class="blind-reading-actions">
+                      <span>Valor capturado: <strong id="valBlindP2Txt" class="state-m2">--- D</strong></span>
+                      <button type="button" class="step-btn step-btn--sm" id="btnRecordP2" onclick="recordBlindReading2()">Tomar 2ª lectura</button>
+                    </div>
                   </div>
                 </div>
 
-                <!-- PASO 3: FÓRMULA DEDUCIDA POR EL ALUMNO -->
-                <div id="blindDeducedBox" style="display: none; background: #070d17; border: 1px solid #1e293b; border-radius: 8px; padding: 9px 12px; margin-bottom: 10px;">
-                  <div style="font-size: 0.74rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px;">Fórmula Deducida por tus Lecturas:</div>
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.8rem; color: #cbd5e1;">
-                    <div>Esfera (P1): <strong id="deducedSphTxt" style="color: #38bdf8;">--</strong></div>
-                    <div>Cilindro (P2 − P1): <strong id="deducedCylTxt" style="color: #fbbf24;">--</strong></div>
+                <div id="blindDeducedBox" class="blind-deduced-box">
+                  <div class="blind-deduced-title">Fórmula deducida por tus lecturas</div>
+                  <div class="calc-grid">
+                    <div>Esfera (P1): <strong id="deducedSphTxt" class="state-m1">--</strong></div>
+                    <div>Cilindro (P2 − P1): <strong id="deducedCylTxt" class="state-cmd">--</strong></div>
                   </div>
-                  <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 0.84rem;">
-                    Receta obtenida: <code id="deducedRecipeTxt" style="font-size: 0.95rem; color: #4ade80; font-weight: 800;">---</code>
+                  <div class="calc-recipe-row">
+                    Receta obtenida: <code id="deducedRecipeTxt">---</code>
                   </div>
                 </div>
 
-                <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 8px;">
-                  Lectura actual en tambores: <strong id="blindMyReadTxt" style="color: #38bdf8; font-family: monospace;">0.00 D a 0°</strong>
+                <div class="blind-current-read">
+                  Lectura actual en tambores: <strong id="blindMyReadTxt">0.00 D a 0°</strong>
                 </div>
 
-                <!-- ACCIONES DE EXAMEN -->
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <button class="step-btn" id="btnGradeBlindExam" style="flex: 1; padding: 8px 12px; font-size: 0.82rem; background: #0284c7; color: #fff; font-weight: 800;" onclick="checkBlindMeasurement()">
-                    🎯 Calificar Examen Completo
-                  </button>
-                  <button class="step-btn" style="width: auto; padding: 8px 12px; font-size: 0.82rem;" onclick="resetBlindExamReadings()" title="Borrar lecturas tomadas y repetir medición en esta misma lente">
-                    🔄 Reiniciar Lecturas
-                  </button>
-                  <button class="step-btn" style="width: auto; padding: 8px 12px; font-size: 0.82rem;" onclick="generateNewBlindLens()" title="Cargar otra lente incógnita de prueba">
-                    🎲 Nueva Lente
-                  </button>
+                <div class="blind-actions-bar">
+                  <button type="button" class="step-btn step-btn--primary step-btn--fill" id="btnGradeBlindExam" onclick="checkBlindMeasurement()">Calificar examen</button>
+                  <button type="button" class="step-btn step-btn--sm" onclick="resetBlindExamReadings()" title="Borrar lecturas tomadas y repetir medición en esta misma lente">Reiniciar lecturas</button>
+                  <button type="button" class="step-btn step-btn--sm" onclick="generateNewBlindLens()" title="Cargar otra lente incógnita de prueba">Nueva lente</button>
                 </div>
 
-                <!-- AUDITORÍA DE RESULTADOS SEGÚN ISO 8598 -->
-                <div aria-live="polite" id="blindResultBox" style="display: none; margin-top: 10px;" class="blind-eval-box"></div>
+                <div aria-live="polite" id="blindResultBox" class="blind-eval-box"></div>
               </div>
             </div>
 
-            <!-- MANDO 3: DESPLAZAMIENTO DE LA LENTE (CENTRADOR) -->
             <div class="drum-control">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">3. Pinza de Apoyo y Centrado de la Lente:</span>
-                <span id="frontoPrismTxt" style="font-size: 0.76rem; font-family: monospace; color: var(--cmd-color);">Prisma: 0.00 Δ</span>
+              <div class="input-header">
+                <span>3. Pinza de apoyo y centrado</span>
+                <span id="frontoPrismTxt" class="prism-readout">Prisma: 0.00 Δ</span>
               </div>
-              <div style="display: flex; align-items: center; justify-content: space-around; gap: 14px;">
+              <div class="pad-layout">
                 <div class="shift-pad-grid">
-                  <div></div>
-                  <button class="pad-btn" id="padUp" onclick="shiftFrontoLens(0, -1)" title="Subir lente">▲</button>
-                  <div></div>
-                  <button class="pad-btn" id="padLeft" onclick="shiftFrontoLens(-1, 0)" title="Mover izquierda">◀</button>
-                  <button class="pad-btn demo-only" id="padCenter" onclick="centerFrontoLens()" style="font-size: 0.7rem;" title="Centrar">●</button>
-                  <button class="pad-btn" id="padRight" onclick="shiftFrontoLens(1, 0)" title="Mover derecha">▶</button>
-                  <div></div>
-                  <button class="pad-btn" id="padDown" onclick="shiftFrontoLens(0, 1)" title="Bajar lente">▼</button>
-                  <div></div>
+                  <button type="button" class="pad-btn" id="padUp" onclick="shiftFrontoLens(0, -1)" title="Subir lente" aria-label="Subir lente">
+                    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+                  </button>
+                  <button type="button" class="pad-btn" id="padLeft" onclick="shiftFrontoLens(-1, 0)" title="Mover izquierda" aria-label="Mover izquierda">
+                    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                  </button>
+                  <button type="button" class="pad-btn demo-only" id="padCenter" onclick="centerFrontoLens()" title="Centrar" aria-label="Centrar lente">
+                    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                  <button type="button" class="pad-btn" id="padRight" onclick="shiftFrontoLens(1, 0)" title="Mover derecha" aria-label="Mover derecha">
+                    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                  </button>
+                  <button type="button" class="pad-btn" id="padDown" onclick="shiftFrontoLens(0, 1)" title="Bajar lente" aria-label="Bajar lente">
+                    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                  </button>
                 </div>
-                <div id="frontoPadNote" style="font-size: 0.79rem; color: var(--text-muted); line-height: 1.45; flex: 1;">
-                  Arrastra con el ratón/dedo directamente sobre el ocular o usa la cruceta para alinear el centro óptico con el cruce de la retícula antes de medir.
-                </div>
-              </div>
-            </div>
-
-            <details class="fronto-settings"><summary>Iluminación y prisma compensador</summary>              <!-- Tinte de Lente (Lentes de Sol) -->
-              <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Tinte:</span>
-                <div class="fronto-pill-segmented">
-                  <button class="fronto-pill-btn active" id="btnTintClear" onclick="setFrontoLensTint('clear')" title="Lente transparente estándar">⚪ Neutro</button>
-                  <button class="fronto-pill-btn" id="btnTintG15" onclick="setFrontoLensTint('g15')" title="Gafa de sol verde grisáceo G-15 (Ray-Ban)">🕶️ G-15</button>
-                  <button class="fronto-pill-btn" id="btnTintBrown" onclick="setFrontoLensTint('brown')" title="Gafa de sol marrón ámbar">🕶️ Marrón</button>
-                  <button class="fronto-pill-btn" id="btnTintDark" onclick="setFrontoLensTint('dark')" title="Gafa de sol gris oscuro Categoría 3">🕶️ Gris</button>
-                </div>
-              </div>
-
-              <!-- Filtro de Luz Ocular -->
-              <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Filtro:</span>
-                <div class="fronto-pill-segmented">
-                  <button class="fronto-pill-btn active" id="btnFilterGreen" onclick="setFrontoLightFilter('green')" title="Luz verde monocromática de mercurio/LED (546 nm ISO)">🟢 Verde 546nm</button>
-                  <button class="fronto-pill-btn" id="btnFilterWhite" onclick="setFrontoLightFilter('white')" title="Luz incandescente blanca con aberración cromática de dispersión">⚪ Halógena</button>
-                </div>
-              </div>
-            <!-- MANDO 4: PRISMA COMPENSADOR DE RISLEY (0 A 20Δ) -->
-            <div class="drum-control fronto-addon-card" id="risleyControlBox">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.85rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
-                  <span>4. Prisma Auxiliar de Risley:</span>
-                </span>
-                <button class="step-btn" id="btnToggleRisley" style="width: auto; padding: 4px 10px; font-size: 0.74rem; background: #1e293b; color: #38bdf8;" onclick="toggleRisleyPrism()">
-                  🌀 Acoplar Prisma
-                </button>
-              </div>
-
-              <div id="risleyControlsArea" style="display: none; flex-direction: column; gap: 8px; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px;">
-                <!-- Potencia del prisma -->
-                <div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px;">
-                    <span>Potencia Prismática:</span>
-                    <strong id="risleyPowerVal" style="color: #38bdf8; font-family: monospace;">0.0 Δ</strong>
-                  </div>
-                  <div class="slider-row">
-                    <button class="drum-fine-btn" onclick="stepRisleyPower(-0.5)">-0.5</button>
-                    <input type="range" aria-label="Potencia del compensador" id="risleyPowerInput" min="0" max="20" step="0.5" value="0" style="accent-color: #38bdf8;" oninput="setRisleyPower(parseFloat(this.value))">
-                    <button class="drum-fine-btn" onclick="stepRisleyPower(0.5)">+0.5</button>
-                  </div>
-                </div>
-
-                <!-- Ángulo de Base -->
-                <div>
-                  <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 3px;">
-                    <span>Orientación de Base:</span>
-                    <strong id="risleyBaseVal" style="color: #4ade80; font-family: monospace;">0° (Derecha)</strong>
-                  </div>
-                  <div class="slider-row">
-                    <button class="drum-fine-btn" onclick="stepRisleyBase(-5)">-5°</button>
-                    <input type="range" aria-label="Base del compensador" id="risleyBaseInput" min="0" max="360" step="1" value="0" style="accent-color: #4ade80;" oninput="setRisleyBase(parseInt(this.value, 10))">
-                    <button class="drum-fine-btn" onclick="stepRisleyBase(5)">+5°</button>
-                  </div>
-                  <div style="display: flex; gap: 4px; margin-top: 5px;">
-                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(90)">90° B.Sup</button>
-                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(270)">270° B.Inf</button>
-                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(0)">0° derecha</button>
-                    <button class="drum-fine-btn" style="flex: 1;" onclick="setRisleyBase(180)">180° izquierda</button>
-                  </div>
+                <div id="frontoPadNote" class="pad-note">
+                  Arrastrá con el ratón o el dedo directamente sobre el ocular, o usá la cruceta para alinear el centro óptico con el cruce de la retícula antes de medir.
                 </div>
               </div>
             </div>
 
-            <!-- MANDO 5: REÓSTATO DE ILUMINACIÓN DE LA LÁMPARA -->
-            <div class="drum-control fronto-addon-card">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 0.85rem; font-weight: 700; color: #fff;">5. Reóstato de Bombilla (Brillo):</span>
-                <span id="frontoLampVal" style="font-size: 0.76rem; font-family: monospace; color: #fde047;">100%</span>
-              </div>
-              <div class="slider-row" style="margin-top: 4px;">
-                <span style="font-size: 0.7rem; color: var(--text-muted);">💡 30%</span>
-                <input type="range" aria-label="Intensidad de la lámpara" id="frontoLampInput" min="30" max="150" step="5" value="100" style="accent-color: #fde047;" oninput="setFrontoLampIntensity(parseInt(this.value, 10))" title="Aumenta el voltaje de la bombilla para lentes de sol oscuras">
-                <span style="font-size: 0.7rem; color: var(--text-muted);">150% 🔆</span>
-              </div>
-            </div>
+            <details class="fronto-settings">
+              <summary>Iluminación y prisma compensador</summary>
+              <div class="fronto-settings-body">
+                <div class="fronto-toolbar-pair">
+                  <span class="toolbar-label">Tinte</span>
+                  <div class="fronto-pill-segmented">
+                    <button type="button" class="fronto-pill-btn active" id="btnTintClear" onclick="setFrontoLensTint('clear')" title="Lente transparente estándar">Neutro</button>
+                    <button type="button" class="fronto-pill-btn" id="btnTintG15" onclick="setFrontoLensTint('g15')" title="Gafa de sol verde grisáceo G-15">G-15</button>
+                    <button type="button" class="fronto-pill-btn" id="btnTintBrown" onclick="setFrontoLensTint('brown')" title="Gafa de sol marrón ámbar">Marrón</button>
+                    <button type="button" class="fronto-pill-btn" id="btnTintDark" onclick="setFrontoLensTint('dark')" title="Gafa de sol gris oscuro categoría 3">Gris</button>
+                  </div>
+                </div>
 
+                <div class="fronto-toolbar-pair">
+                  <span class="toolbar-label">Filtro</span>
+                  <div class="fronto-pill-segmented">
+                    <button type="button" class="fronto-pill-btn active" id="btnFilterGreen" onclick="setFrontoLightFilter('green')" title="Luz verde monocromática de mercurio/LED (546 nm ISO)">Verde 546 nm</button>
+                    <button type="button" class="fronto-pill-btn" id="btnFilterWhite" onclick="setFrontoLightFilter('white')" title="Luz incandescente blanca con aberración cromática de dispersión">Halógena</button>
+                  </div>
+                </div>
+
+                <div class="fronto-addon-row" id="risleyControlBox">
+                  <div class="input-header">
+                    <span>4. Prisma auxiliar de Risley</span>
+                    <button type="button" class="step-btn step-btn--sm btn-risley" id="btnToggleRisley" data-active="false" onclick="toggleRisleyPrism()">Acoplar prisma</button>
+                  </div>
+
+                  <div id="risleyControlsArea" class="risley-area">
+                    <div>
+                      <div class="input-header">
+                        <span>Potencia prismática</span>
+                        <strong id="risleyPowerVal" class="rx-mono">0.0 Δ</strong>
+                      </div>
+                      <div class="slider-row">
+                        <button type="button" class="drum-fine-btn" onclick="stepRisleyPower(-0.5)">−0.5</button>
+                        <input type="range" aria-label="Potencia del compensador" id="risleyPowerInput" min="0" max="20" step="0.5" value="0" oninput="setRisleyPower(parseFloat(this.value))">
+                        <button type="button" class="drum-fine-btn" onclick="stepRisleyPower(0.5)">+0.5</button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div class="input-header">
+                        <span>Orientación de base</span>
+                        <strong id="risleyBaseVal" class="rx-mono">0° (Derecha)</strong>
+                      </div>
+                      <div class="slider-row">
+                        <button type="button" class="drum-fine-btn" onclick="stepRisleyBase(-5)">−5°</button>
+                        <input type="range" aria-label="Base del compensador" id="risleyBaseInput" min="0" max="360" step="1" value="0" oninput="setRisleyBase(parseInt(this.value, 10))">
+                        <button type="button" class="drum-fine-btn" onclick="stepRisleyBase(5)">+5°</button>
+                      </div>
+                      <div class="risley-presets">
+                        <button type="button" class="drum-fine-btn" onclick="setRisleyBase(90)">90° B.Sup</button>
+                        <button type="button" class="drum-fine-btn" onclick="setRisleyBase(270)">270° B.Inf</button>
+                        <button type="button" class="drum-fine-btn" onclick="setRisleyBase(0)">0° derecha</button>
+                        <button type="button" class="drum-fine-btn" onclick="setRisleyBase(180)">180° izquierda</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="fronto-addon-row">
+                  <div class="input-header">
+                    <span>5. Reóstato de bombilla</span>
+                    <span id="frontoLampVal" class="rx-mono">100%</span>
+                  </div>
+                  <div class="lamp-row">
+                    <span>30%</span>
+                    <input type="range" aria-label="Intensidad de la lámpara" id="frontoLampInput" min="30" max="150" step="5" value="100" oninput="setFrontoLampIntensity(parseInt(this.value, 10))" title="Aumenta el voltaje de la bombilla para lentes de sol oscuras">
+                    <span>150%</span>
+                  </div>
+                </div>
+              </div>
             </details>
           </div>
-
         </div>
       </div>
 
-      <!-- ================= PESTAÑA 4: MODO EXAMEN / QUIZ ================= -->
+      <!-- Pestaña 4: Autoevaluación -->
       <div class="tab-view" id="view-quiz">
-        <div class="quiz-container">
-          
+        <div class="quiz-sheet">
           <div class="quiz-header">
             <div>
-              <h2 style="font-size: 1.2rem; font-weight: 800; color: #fff;">Autoevaluación para Técnicos Ópticos</h2>
-              <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Preguntas de examen con corrección y feedback en tiempo real.</p>
+              <h2>Autoevaluación para Técnicos Ópticos</h2>
+              <p>Preguntas de examen con corrección y explicación clínica inmediata.</p>
             </div>
             <div class="score-badge" id="quizScore">Puntaje: 0 / 0 (0%)</div>
           </div>
 
-          <div style="background: #0b111a; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.85rem; color: var(--text-muted);">Receta de prueba actual:</span>
-            <code id="quizRecipeCode" style="font-size: 1.1rem; font-weight: 800; color: var(--primary);">-2.50 ( ) -1.75 a 45°</code>
-            <button class="step-btn" style="width: auto; padding: 5px 12px; font-size: 0.78rem;" onclick="generateRandomQuizQuestion()">Generar Nueva Pregunta</button>
+          <div class="quiz-recipe-bar">
+            <div>
+              <span class="quiz-recipe-label">Receta de prueba: </span>
+              <code id="quizRecipeCode" class="quiz-recipe-code">-2.50 ( ) -1.75 a 45°</code>
+            </div>
+            <button type="button" class="step-btn step-btn--sm" onclick="generateRandomQuizQuestion()">Nueva pregunta</button>
           </div>
 
-          <div class="question-box" id="quizQuestionText">
-            ¿Cuál es el vicio de refracción que corresponde a esta receta?
+          <div class="quiz-body">
+            <div class="question-box" id="quizQuestionText">
+              ¿Cuál es el vicio de refracción que corresponde a esta receta?
+            </div>
+
+            <div class="options-grid" id="quizOptionsContainer"></div>
+
+            <div class="feedback-box" id="quizFeedbackBox" role="status"></div>
+
+            <div class="quiz-actions">
+              <button type="button" id="quizLoadBtn" class="step-btn" hidden onclick="loadQuizRecipeIntoSimulator()">Explorar receta</button>
+              <button type="button" id="quizNextBtn" class="step-btn step-btn--primary" hidden onclick="generateRandomQuizQuestion()">Siguiente pregunta</button>
+            </div>
           </div>
-
-          <div class="options-grid" id="quizOptionsContainer">
-            <!-- Opciones generadas por JS -->
-          </div>
-
-          <div class="feedback-box" id="quizFeedbackBox" role="status"></div>
-
-          <div style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button id="quizLoadBtn" class="step-btn" style="width: auto; padding: 8px 16px; font-size: 0.82rem; display: none;" onclick="loadQuizRecipeIntoSimulator()">
-              Explorar esta receta
-            </button>
-            <button id="quizNextBtn" class="step-btn" style="width: auto; padding: 8px 18px; font-size: 0.85rem; background: var(--primary); color: #000; display: none;" onclick="generateRandomQuizQuestion()">
-              Siguiente Pregunta ➔
-            </button>
-          </div>
-
         </div>
       </div>
-
     </main>
   </div>
 
+  <script src="rayos3d.js"></script>
   <script src="lente3d.js"></script>
   <script>
     // --- ESTADO GLOBAL ---
@@ -2831,7 +916,7 @@
       sidebar.classList.toggle('mobile-expanded');
       const isExpanded = sidebar.classList.contains('mobile-expanded');
       if (indicator) {
-        indicator.textContent = isExpanded ? '▲ Cerrar Controles' : '▼ Abrir Controles';
+        indicator.textContent = isExpanded ? 'Cerrar' : 'Abrir';
       }
       if (toggleBtn) {
         toggleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
@@ -2895,12 +980,10 @@
       }
       if (toggleBtn) {
         toggleBtn.classList.toggle('collapsed', isSidebarCollapsed);
-      }
-      if (icon) {
-        icon.textContent = isSidebarCollapsed ? '▶' : '◀';
+        toggleBtn.setAttribute('aria-expanded', String(!isSidebarCollapsed));
       }
       if (txt) {
-        txt.textContent = isSidebarCollapsed ? 'Mostrar Panel' : 'Ocultar Panel';
+        txt.textContent = isSidebarCollapsed ? 'Mostrar panel' : 'Ocultar panel';
       }
 
       // Redibujado oportuno de los canvases tras el redimensionamiento del layout
@@ -2930,7 +1013,7 @@
         btn.setAttribute("aria-expanded", isFrontoGuideOpen);
       }
       if (arrow) {
-        arrow.textContent = isFrontoGuideOpen ? '▴' : '▾';
+        arrow.setAttribute('data-open', isFrontoGuideOpen ? 'true' : 'false');
       }
     }
 
@@ -3046,7 +1129,7 @@
 
       bullet1.innerHTML = `<strong>Meridiano 1 (${opt.ax1}°):</strong> Potencia ${formatDiopter(opt.p1)}. ${getFocalText(opt.p1)}`;
       bullet2.innerHTML = `<strong>Meridiano 2 (${opt.ax2}°):</strong> Potencia ${formatDiopter(opt.p2)}. ${getFocalText(opt.p2)}`;
-      bullet3.innerHTML = `<strong>Intervalo de Sturm:</strong> Separación cilíndrica de ${Math.abs(state.cyl).toFixed(2)} D. ${state.lensActive ? '<strong style="color: #22c55e;">[GAFA PUESTA: Rayos corregidos en retina]</strong>' : 'Sin corrección.'}`;
+      bullet3.innerHTML = `<strong>Intervalo de Sturm:</strong> Separación cilíndrica de ${Math.abs(state.cyl).toFixed(2)} D. ${state.lensActive ? '<strong class="state-ok">[Lente colocada: rayos corregidos en retina]</strong>' : 'Sin corrección.'}`;
 
       drawAxisDial();
       drawEyeCanvas();
@@ -3062,11 +1145,11 @@
         badgeEl.className = "badge-status status-emetrope";
         badgeEl.textContent = "Emétrope";
       } else if (p < 0) {
-        statusEl.innerHTML = `Enfoca por <strong style="color: #38bdf8;">DELANTE</strong> de la retina.`;
+        statusEl.innerHTML = `Enfoca por <strong class="state-m1">delante</strong> de la retina.`;
         badgeEl.className = "badge-status status-miope";
         badgeEl.textContent = "Miópico";
       } else {
-        statusEl.innerHTML = `Enfoca por <strong style="color: #f43f5e;">DETRÁS</strong> de la retina.`;
+        statusEl.innerHTML = `Enfoca por <strong class="state-m2">detrás</strong> de la retina.`;
         badgeEl.className = "badge-status status-hiper";
         badgeEl.textContent = "Hipermétrope";
       }
@@ -3157,16 +1240,23 @@
       document.getElementById('tabCombined').classList.toggle('active', mode === 'combined');
       document.getElementById('tabM1').classList.toggle('active', mode === 'm1');
       document.getElementById('tabM2').classList.toggle('active', mode === 'm2');
+      document.getElementById('tabCombined').setAttribute('aria-pressed', String(mode === 'combined'));
+      document.getElementById('tabM1').setAttribute('aria-pressed', String(mode === 'm1'));
+      document.getElementById('tabM2').setAttribute('aria-pressed', String(mode === 'm2'));
       drawEyeCanvas();
     }
 
     // --- TRANSPORTADOR DE ÁNGULOS (DIAL DE EJE TABO) ---
+    function cssTok(name) {
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
+
     function drawAxisDial() {
       const w = dialCanvas.width, h = dialCanvas.height;
       const cx = w / 2, cy = h / 2, r = w * 0.42;
 
       dialCtx.clearRect(0, 0, w, h);
-      dialCtx.strokeStyle = "#334155";
+      dialCtx.strokeStyle = cssTok('--color-bench-rule');
       dialCtx.lineWidth = 2;
       dialCtx.beginPath();
       dialCtx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -3177,12 +1267,12 @@
         dialCtx.beginPath();
         dialCtx.moveTo(cx + (r - 6) * Math.cos(rad), cy - (r - 6) * Math.sin(rad));
         dialCtx.lineTo(cx + r * Math.cos(rad), cy - r * Math.sin(rad));
-        dialCtx.strokeStyle = "#64748b";
+        dialCtx.strokeStyle = cssTok('--color-bench-muted');
         dialCtx.stroke();
       }
 
       const rad1 = (state.axis * Math.PI) / 180;
-      dialCtx.strokeStyle = "#38bdf8";
+      dialCtx.strokeStyle = cssTok('--color-m1-bright');
       dialCtx.lineWidth = 3;
       dialCtx.beginPath();
       dialCtx.moveTo(cx - (r - 4) * Math.cos(rad1), cy + (r - 4) * Math.sin(rad1));
@@ -3190,7 +1280,7 @@
       dialCtx.stroke();
 
       const rad2 = rad1 + Math.PI / 2;
-      dialCtx.strokeStyle = "#f43f5e";
+      dialCtx.strokeStyle = cssTok('--color-m2-bright');
       dialCtx.lineWidth = 2.5;
       dialCtx.setLineDash([4, 3]);
       dialCtx.beginPath();
@@ -3199,7 +1289,7 @@
       dialCtx.stroke();
       dialCtx.setLineDash([]);
 
-      dialCtx.fillStyle = "#f8fafc";
+      dialCtx.fillStyle = cssTok('--color-bench-ink');
       dialCtx.beginPath();
       dialCtx.arc(cx, cy, 4, 0, Math.PI * 2);
       dialCtx.fill();
@@ -3417,8 +1507,10 @@
 
       crossCtx.clearRect(0, 0, w, h);
 
-      // Círculo graduado TABO de fondo
-      crossCtx.strokeStyle = "#1e293b";
+      const m1Color = cssTok('--color-m1-bright');
+      const m2Color = cssTok('--color-m2-bright');
+
+      crossCtx.strokeStyle = cssTok('--color-bench-rule');
       crossCtx.lineWidth = 2;
       crossCtx.beginPath();
       crossCtx.arc(cx, cy, r, 0, Math.PI * 2);
@@ -3428,7 +1520,7 @@
         const rad = (deg * Math.PI) / 180;
         const isMain = deg % 30 === 0;
         const tickLen = isMain ? 12 : 6;
-        crossCtx.strokeStyle = isMain ? "#475569" : "#334155";
+        crossCtx.strokeStyle = isMain ? cssTok('--color-bench-rule-2') : cssTok('--color-bench-rule');
         crossCtx.beginPath();
         crossCtx.moveTo(cx + (r - tickLen) * Math.cos(rad), cy - (r - tickLen) * Math.sin(rad));
         crossCtx.lineTo(cx + r * Math.cos(rad), cy - r * Math.sin(rad));
@@ -3437,8 +1529,8 @@
         crossCtx.stroke();
 
         if (isMain) {
-          crossCtx.fillStyle = "#64748b";
-          crossCtx.font = '16px system-ui';
+          crossCtx.fillStyle = cssTok('--color-bench-muted');
+          crossCtx.font = '500 18px "Host Grotesk", system-ui, sans-serif';
           crossCtx.textAlign = 'center';
           crossCtx.textBaseline = 'middle';
           const txtR = r + 24;
@@ -3446,54 +1538,50 @@
         }
       }
 
-      // BRAZO 1 (Meridiano 1 - Eje de la receta)
       const rad1 = (opt.ax1 * Math.PI) / 180;
-      crossCtx.strokeStyle = "#38bdf8";
+      crossCtx.strokeStyle = m1Color;
       crossCtx.lineWidth = 6;
       crossCtx.beginPath();
       crossCtx.moveTo(cx - r * Math.cos(rad1), cy + r * Math.sin(rad1));
       crossCtx.lineTo(cx + r * Math.cos(rad1), cy - r * Math.sin(rad1));
       crossCtx.stroke();
 
-      // BRAZO 2 (Meridiano 2 - Perpendicular)
       const rad2 = (opt.ax2 * Math.PI) / 180;
-      crossCtx.strokeStyle = "#f43f5e";
+      crossCtx.strokeStyle = m2Color;
       crossCtx.lineWidth = 6;
       crossCtx.beginPath();
       crossCtx.moveTo(cx - r * Math.cos(rad2), cy + r * Math.sin(rad2));
       crossCtx.lineTo(cx + r * Math.cos(rad2), cy - r * Math.sin(rad2));
       crossCtx.stroke();
 
-      // Centro
-      crossCtx.fillStyle = "#fff";
+      crossCtx.fillStyle = cssTok('--color-bench-ink');
       crossCtx.beginPath();
       crossCtx.arc(cx, cy, 8, 0, Math.PI * 2);
       crossCtx.fill();
 
-      // Etiquetas de Potencia en los extremos
       function drawCrossLabel(rad, text, color, dist) {
         const lx = cx + dist * Math.cos(rad);
         const ly = cy - dist * Math.sin(rad);
 
         crossCtx.save();
-        crossCtx.fillStyle = "#090d16";
+        crossCtx.fillStyle = cssTok('--color-bench-3');
         crossCtx.strokeStyle = color;
         crossCtx.lineWidth = 2;
         crossCtx.beginPath();
-        crossCtx.roundRect(lx - 55, ly - 20, 110, 40, 8);
+        crossCtx.roundRect(lx - 58, ly - 20, 116, 40, 8);
         crossCtx.fill();
         crossCtx.stroke();
 
         crossCtx.fillStyle = color;
-        crossCtx.font = 'bold 20px monospace';
+        crossCtx.font = '500 20px "Atkinson Hyperlegible Mono", monospace';
         crossCtx.textAlign = 'center';
         crossCtx.textBaseline = 'middle';
         crossCtx.fillText(text, lx, ly);
         crossCtx.restore();
       }
 
-      drawCrossLabel(rad1, formatDiopter(opt.p1), "#38bdf8", r * 0.7);
-      drawCrossLabel(rad2, formatDiopter(opt.p2), "#f43f5e", r * 0.7);
+      drawCrossLabel(rad1, formatDiopter(opt.p1), m1Color, r * 0.7);
+      drawCrossLabel(rad2, formatDiopter(opt.p2), m2Color, r * 0.7);
     }
 
     function updateCrossSteps(opt) {
@@ -3501,9 +1589,11 @@
       document.getElementById('crossStep2').innerHTML = `A <strong>${opt.ax2}°</strong> actúa la suma (Esfera + Cilindro): <strong>${formatDiopter(opt.p2)}</strong>.`;
       document.getElementById('crossStep3').innerHTML = `Cil. <strong>${formatDiopter(opt.p1)}</strong> a <strong>${opt.ax2}°</strong> (+) Cil. <strong>${formatDiopter(opt.p2)}</strong> a <strong>${opt.ax1}°</strong>`;
       document.getElementById('crossStep4').innerHTML = `
-        • Nueva Esfera = Esf + Cil = <strong>${formatDiopter(opt.transSph)}</strong><br>
-        • Nuevo Cilindro = Signo opuesto (<strong>${formatDiopter(opt.transCyl)}</strong>)<br>
-        • Nuevo Eje = <strong>${opt.transAx}°</strong> (${opt.ax1}° ± 90°)
+        <ul class="trans-steps">
+          <li>Nueva esfera = Esf + Cil = <strong>${formatDiopter(opt.transSph)}</strong></li>
+          <li>Nuevo cilindro = Signo opuesto (<strong>${formatDiopter(opt.transCyl)}</strong>)</li>
+          <li>Nuevo eje = <strong>${opt.transAx}°</strong> (${opt.ax1}° ± 90°)</li>
+        </ul>
       `;
     }
 
@@ -3667,11 +1757,12 @@
     function toggleFrontoAudio() {
       frontoState.audioMuted = !frontoState.audioMuted;
       const btn = document.getElementById('frontoAudioToggleBtn');
-      const icon = document.getElementById('frontoAudioIcon');
       const txt = document.getElementById('frontoAudioTxt');
-      if (btn) btn.classList.toggle('muted', frontoState.audioMuted);
-      if (icon) icon.textContent = frontoState.audioMuted ? '🔇' : '🔊';
-      if (txt) txt.textContent = frontoState.audioMuted ? 'Audio Taller: OFF' : 'Audio Taller: ON';
+      if (btn) {
+        btn.classList.toggle('muted', frontoState.audioMuted);
+        btn.setAttribute('aria-pressed', String(!frontoState.audioMuted));
+      }
+      if (txt) txt.textContent = frontoState.audioMuted ? 'Audio apagado' : 'Audio activo';
       if (!frontoState.audioMuted) FrontoAudio.playRatchet(1500);
     }
 
@@ -3735,14 +1826,12 @@
 
       const isFs = container.classList.contains('fullscreen-active');
       const fsBtn = document.getElementById('frontoFsBtn');
-      const fsIcon = document.getElementById('frontoFsIcon');
       const fsTxt = document.getElementById('frontoFsTxt');
 
       if (!isFs) {
         container.classList.add('fullscreen-active');
         if (fsBtn) fsBtn.classList.add('active');
-        if (fsIcon) fsIcon.textContent = '✕';
-        if (fsTxt) fsTxt.textContent = 'Salir Pantalla Completa';
+        if (fsTxt) fsTxt.textContent = 'Salir';
 
         if (container.requestFullscreen) {
           container.requestFullscreen().catch(() => {});
@@ -3752,8 +1841,7 @@
       } else {
         container.classList.remove('fullscreen-active');
         if (fsBtn) fsBtn.classList.remove('active');
-        if (fsIcon) fsIcon.textContent = '⛶';
-        if (fsTxt) fsTxt.textContent = 'Pantalla Completa';
+        if (fsTxt) fsTxt.textContent = 'Pantalla completa';
 
         if (document.fullscreenElement) {
           document.exitFullscreen().catch(() => {});
@@ -3790,7 +1878,7 @@
       if (mode !== 'demo') {
         if (badge) badge.style.display = 'inline-block';
         if (normArea) normArea.style.display = 'none';
-        if (blindArea) blindArea.style.display = 'block';
+        if (blindArea) blindArea.style.display = 'flex';
         if (!frontoState.blindLens || mode === 'blind') {
           generateNewBlindLens();
         } else {
@@ -3820,10 +1908,8 @@
       const badge = document.getElementById('badgeBlindP1');
       const valTxt = document.getElementById('valBlindP1Txt');
       if (badge) {
-        badge.textContent = "✅ Registrada";
-        badge.style.background = "rgba(34, 197, 94, 0.2)";
-        badge.style.color = "#4ade80";
-        badge.style.borderColor = "#22c55e";
+        badge.textContent = "Registrada";
+        badge.dataset.state = "recorded";
       }
       if (valTxt) {
         valTxt.textContent = `${formatDialPower(frontoState.power)} a ${frontoState.axis}°`;
@@ -3845,10 +1931,8 @@
       const badge = document.getElementById('badgeBlindP2');
       const valTxt = document.getElementById('valBlindP2Txt');
       if (badge) {
-        badge.textContent = "✅ Registrada";
-        badge.style.background = "rgba(34, 197, 94, 0.2)";
-        badge.style.color = "#4ade80";
-        badge.style.borderColor = "#22c55e";
+        badge.textContent = "Registrada";
+        badge.dataset.state = "recorded";
       }
       if (valTxt) {
         valTxt.textContent = `${formatDialPower(frontoState.power)}`;
@@ -3896,20 +1980,16 @@
       const bP1 = document.getElementById('badgeBlindP1');
       const vP1 = document.getElementById('valBlindP1Txt');
       if (bP1) {
-        bP1.textContent = "⏳ Pendiente";
-        bP1.style.background = "rgba(234, 179, 8, 0.15)";
-        bP1.style.color = "#fde047";
-        bP1.style.borderColor = "rgba(234, 179, 8, 0.3)";
+        bP1.textContent = "Pendiente";
+        bP1.dataset.state = "pending";
       }
       if (vP1) vP1.textContent = "--- D a ---°";
 
       const bP2 = document.getElementById('badgeBlindP2');
       const vP2 = document.getElementById('valBlindP2Txt');
       if (bP2) {
-        bP2.textContent = "⏳ Pendiente";
-        bP2.style.background = "rgba(234, 179, 8, 0.15)";
-        bP2.style.color = "#fde047";
-        bP2.style.borderColor = "rgba(234, 179, 8, 0.3)";
+        bP2.textContent = "Pendiente";
+        bP2.dataset.state = "pending";
       }
       if (vP2) vP2.textContent = "--- D";
 
@@ -3970,21 +2050,18 @@
       // Validar si ambas lecturas han sido capturadas
       if (p1User === null || p2User === null) {
         resBox.style.display = 'flex';
-        resBox.style.borderColor = '#f59e0b';
-        resBox.style.background = 'rgba(245, 158, 11, 0.12)';
+        resBox.dataset.result = 'incomplete';
         FrontoAudio.playRatchet(900);
         resBox.innerHTML = `
-          <div style="font-weight: 800; color: #fbbf24; font-size: 0.95rem;">
-            ⚠️ LECTURAS INCOMPLETAS PARA EL CÁLCULO
+          <div class="blind-result-head">
+            <span class="state-warn">Lecturas incompletas para el cálculo</span>
           </div>
-          <div style="color: #cbd5e1; font-size: 0.82rem; line-height: 1.4;">
-            Para obtener la graduación completa de la lente necesitas realizar y registrar <strong>ambas lecturas</strong>:<br>
-            • ${p1User === null ? '❌ <strong>1ª Lectura (P1 y eje):</strong> Pendiente de registrar.' : '✅ <strong>1ª Lectura:</strong> Registrada (' + formatDiopter(p1User) + ' D a ' + axUser + '°)'}<br>
-            • ${p2User === null ? '❌ <strong>2ª Lectura (P2):</strong> Pendiente de registrar.' : '✅ <strong>2ª Lectura:</strong> Registrada (' + formatDiopter(p2User) + ' D)'}<br>
-            <span style="color: #94a3b8; font-size: 0.76rem; margin-top: 4px; display: inline-block;">
-              Gira los tambores para enfocar cada meridiano y pulsa sus respectivos botones antes de calificar.
-            </span>
-          </div>
+          <p>Para obtener la graduación completa necesitás registrar ambas lecturas:</p>
+          <ul class="trans-steps">
+            <li>${p1User === null ? '<strong class="state-bad">Pendiente:</strong> 1ª Lectura (P1 y eje).' : '<strong class="state-ok">Registrada:</strong> 1ª Lectura (' + formatDiopter(p1User) + ' a ' + axUser + '°)'}</li>
+            <li>${p2User === null ? '<strong class="state-bad">Pendiente:</strong> 2ª Lectura (P2).' : '<strong class="state-ok">Registrada:</strong> 2ª Lectura (' + formatDiopter(p2User) + ')'}</li>
+          </ul>
+          <p>Girá los tambores para enfocar cada meridiano y registrá ambos focos antes de calificar.</p>
         `;
         return;
       }
@@ -4048,87 +2125,82 @@
       if (isSpherical) feedback.push('En esta lente esférica coinciden P1 y P2. El eje es indiferente.');
 
       resBox.style.display = 'flex';
+      resBox.dataset.result = allPassed ? 'pass' : 'fail';
       if (allPassed) {
-        resBox.style.borderColor = '#22c55e';
-        resBox.style.background = 'rgba(34, 197, 94, 0.12)';
         FrontoAudio.playRatchet(1900);
         setTimeout(() => FrontoAudio.playRatchet(2200), 120);
       } else {
-        resBox.style.borderColor = '#ef4444';
-        resBox.style.background = 'rgba(239, 68, 68, 0.12)';
         FrontoAudio.playRatchet(700);
       }
 
       resBox.innerHTML = `
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
-          <div style="font-weight: 800; font-size: 0.95rem; color: ${allPassed ? '#4ade80' : '#f87171'};">
-            ${allPassed ? '🏆 EXAMEN DE GRADUACIÓN APROBADO' : '❌ EXAMEN FUERA DE TOLERANCIA'}
-          </div>
-          <span style="font-size: 0.74rem; font-weight: 800; padding: 2px 8px; border-radius: 4px; background: ${allPassed ? 'rgba(34, 197, 94, 0.25)' : 'rgba(239, 68, 68, 0.25)'}; color: ${allPassed ? '#4ade80' : '#fca5a5'};">
-            Puntuación: ${Math.round((passedChecks / totalChecks) * 100)}%
-          </span>
+        <div class="blind-result-head">
+          <span class="${allPassed ? 'state-ok' : 'state-bad'}">${allPassed ? 'Examen de graduación aprobado' : 'Examen fuera de tolerancia'}</span>
+          <span class="blind-result-score ${allPassed ? 'state-ok' : 'state-bad'}">Puntuación: ${Math.round((passedChecks / totalChecks) * 100)}%</span>
         </div>
 
-        <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 4px;">
-          • Receta real de la lente: <code style="color: #38bdf8; font-weight: 800;">${formatRecipe(target.sph, target.cyl, target.axis)}</code>
-          ${isTransposed ? '<span style="color: #fbbf24; font-size: 0.72rem; margin-left: 6px;">(Mediste en forma de cilindro positivo/transpuesta)</span>' : ''}
+        <div>
+          Receta real de la lente: <code class="rx-mono state-m1">${formatRecipe(target.sph, target.cyl, target.axis)}</code>
+          ${isTransposed ? '<span class="state-warn"> (Mediste en forma transpuesta)</span>' : ''}
         </div>
 
         <p>Tolerancias del ejercicio. ${feedback.join(' ')}</p>
-        <table class="blind-audit-table">
-          <thead>
-            <tr>
-              <th>Parámetro</th>
-              <th>Tu Medición</th>
-              <th>Valor Real</th>
-              <th>Tolerancia</th>
-              <th>Veredicto</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>1ª Lectura (P1)</strong></td>
-              <td style="color: #38bdf8; font-family: monospace;">${formatDiopter(p1User)}</td>
-              <td style="font-family: monospace;">${formatDiopter(p1Target)}</td>
-              <td>±${powerTol.toFixed(2)} D</td>
-              <td>${passP1 ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Desvío: ' + (p1User - p1Target > 0 ? '+' : '') + (p1User - p1Target).toFixed(2) + ' D</span>'}</td>
-            </tr>
-            <tr>
-              <td><strong>2ª Lectura (P2)</strong></td>
-              <td style="color: #f43f5e; font-family: monospace;">${formatDiopter(p2User)}</td>
-              <td style="font-family: monospace;">${formatDiopter(p2Target)}</td>
-              <td>±${powerTol.toFixed(2)} D</td>
-              <td>${passP2 ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Desvío: ' + (p2User - p2Target > 0 ? '+' : '') + (p2User - p2Target).toFixed(2) + ' D</span>'}</td>
-            </tr>
-            <tr>
-              <td><strong>Cilindro (P2−P1)</strong></td>
-              <td style="color: #fbbf24; font-family: monospace;">${formatDiopter(cylUser)}</td>
-              <td style="font-family: monospace;">${formatDiopter(cylTarget)}</td>
-              <td>±${powerTol.toFixed(2)} D</td>
-              <td>${passCyl ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Desvío: ' + (cylUser - cylTarget > 0 ? '+' : '') + (cylUser - cylTarget).toFixed(2) + ' D</span>'}</td>
-            </tr>
-            <tr>
-              <td><strong>Eje Transportador</strong></td>
-              <td style="color: #4ade80; font-family: monospace;">${axUser}°</td>
-              <td style="font-family: monospace;">${isSpherical ? 'N/A' : axTarget + '°'}</td>
-              <td>${isSpherical ? 'N/A' : '±' + axisTol + '°'}</td>
-              <td>${passAx ? '<span style="color: #4ade80;">✅ Correcto</span>' : '<span style="color: #f87171;">❌ Error: ' + diffAx + '°</span>'}</td>
-            </tr>
-            <tr>
-              <td><strong>Centrado Óptico</strong></td>
-              <td style="font-family: monospace;">${prismUser.toFixed(2)} Δ</td>
-              <td style="font-family: monospace;">0.00 Δ</td>
-              <td>≤ ${prismTol.toFixed(2)} Δ</td>
-              <td>${passCenter ? '<span style="color: #4ade80;">✅ Impecable</span>' : '<span style="color: #f87171;">❌ Descentrada (' + prismUser.toFixed(2) + 'Δ)</span>'}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div style="font-size: 0.77rem; color: #94a3b8; line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
-          ${allPassed 
-            ? '🎉 <strong>Dictamen Oficial:</strong> Lente aprobada para biselado y montaje según normas internacionales de laboratorio oftálmico.' 
-            : '💡 <strong>Consejo de Taller:</strong> Asegúrate de centrar la cruceta antes de tomar P1, y gira el tambor hasta que cada conjunto de líneas alcance el destello máximo de nitidez.'}
+        <div class="blind-audit-wrap">
+          <table class="blind-audit-table">
+            <thead>
+              <tr>
+                <th>Parámetro</th>
+                <th>Tu medición</th>
+                <th>Valor real</th>
+                <th>Tolerancia</th>
+                <th>Veredicto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Parámetro"><strong>1ª Lectura (P1)</strong></td>
+                <td data-label="Tu medición" class="rx-mono state-m1">${formatDiopter(p1User)}</td>
+                <td data-label="Valor real" class="rx-mono">${formatDiopter(p1Target)}</td>
+                <td data-label="Tolerancia">±${powerTol.toFixed(2)} D</td>
+                <td data-label="Veredicto">${passP1 ? '<span class="state-ok">Correcto</span>' : '<span class="state-bad">Desvío: ' + (p1User - p1Target > 0 ? '+' : '') + (p1User - p1Target).toFixed(2) + ' D</span>'}</td>
+              </tr>
+              <tr>
+                <td data-label="Parámetro"><strong>2ª Lectura (P2)</strong></td>
+                <td data-label="Tu medición" class="rx-mono state-m2">${formatDiopter(p2User)}</td>
+                <td data-label="Valor real" class="rx-mono">${formatDiopter(p2Target)}</td>
+                <td data-label="Tolerancia">±${powerTol.toFixed(2)} D</td>
+                <td data-label="Veredicto">${passP2 ? '<span class="state-ok">Correcto</span>' : '<span class="state-bad">Desvío: ' + (p2User - p2Target > 0 ? '+' : '') + (p2User - p2Target).toFixed(2) + ' D</span>'}</td>
+              </tr>
+              <tr>
+                <td data-label="Parámetro"><strong>Cilindro (P2−P1)</strong></td>
+                <td data-label="Tu medición" class="rx-mono state-cmd">${formatDiopter(cylUser)}</td>
+                <td data-label="Valor real" class="rx-mono">${formatDiopter(cylTarget)}</td>
+                <td data-label="Tolerancia">±${powerTol.toFixed(2)} D</td>
+                <td data-label="Veredicto">${passCyl ? '<span class="state-ok">Correcto</span>' : '<span class="state-bad">Desvío: ' + (cylUser - cylTarget > 0 ? '+' : '') + (cylUser - cylTarget).toFixed(2) + ' D</span>'}</td>
+              </tr>
+              <tr>
+                <td data-label="Parámetro"><strong>Eje transportador</strong></td>
+                <td data-label="Tu medición" class="rx-mono state-ok">${axUser}°</td>
+                <td data-label="Valor real" class="rx-mono">${isSpherical ? 'N/A' : axTarget + '°'}</td>
+                <td data-label="Tolerancia">${isSpherical ? 'N/A' : '±' + axisTol + '°'}</td>
+                <td data-label="Veredicto">${passAx ? '<span class="state-ok">Correcto</span>' : '<span class="state-bad">Error: ' + diffAx + '°</span>'}</td>
+              </tr>
+              <tr>
+                <td data-label="Parámetro"><strong>Centrado óptico</strong></td>
+                <td data-label="Tu medición" class="rx-mono">${prismUser.toFixed(2)} Δ</td>
+                <td data-label="Valor real" class="rx-mono">0.00 Δ</td>
+                <td data-label="Tolerancia">≤ ${prismTol.toFixed(2)} Δ</td>
+                <td data-label="Veredicto">${passCenter ? '<span class="state-ok">Impecable</span>' : '<span class="state-bad">Descentrada (' + prismUser.toFixed(2) + 'Δ)</span>'}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+
+        <p>
+          ${allPassed
+            ? '<strong>Dictamen oficial:</strong> Lente aprobada para biselado y montaje según normas internacionales de laboratorio oftálmico.'
+            : '<strong>Consejo de taller:</strong> Centrá la cruceta antes de tomar P1 y girá el tambor hasta lograr nitidez máxima en cada familia de líneas.'}
+        </p>
       `;
     }
 
@@ -4138,17 +2210,8 @@
       const btn = document.getElementById('btnToggleRisley');
       const area = document.getElementById('risleyControlsArea');
       if (btn) {
-        if (frontoState.risleyActive) {
-          btn.innerHTML = `🌀 Desacoplar Prisma`;
-          btn.style.background = 'rgba(56, 189, 248, 0.2)';
-          btn.style.color = '#38bdf8';
-          btn.style.borderColor = '#0284c7';
-        } else {
-          btn.innerHTML = `🌀 Acoplar Prisma`;
-          btn.style.background = '#1e293b';
-          btn.style.color = '#38bdf8';
-          btn.style.borderColor = 'var(--border)';
-        }
+        btn.dataset.active = frontoState.risleyActive ? 'true' : 'false';
+        btn.textContent = frontoState.risleyActive ? 'Desacoplar prisma' : 'Acoplar prisma';
       }
       if (area) {
         area.style.display = frontoState.risleyActive ? 'flex' : 'none';
@@ -4242,19 +2305,13 @@
       const btn = document.getElementById('btnClampToggle');
       const padNote = document.getElementById('frontoPadNote');
       if (btn) {
-        if (frontoState.clamped) {
-          btn.innerHTML = `🔒 Levantar Pinza (Lente Fijada)`;
-          btn.style.background = "rgba(34, 197, 94, 0.2)";
-          btn.style.color = "#4ade80";
-          btn.style.borderColor = "#22c55e";
-          if (padNote) padNote.innerHTML = `<strong style="color: #4ade80;">[Lente Inmovilizada]:</strong> La pinza de sujeción mantiene la lente fijada para medir o marcar sin desviaciones.`;
-        } else {
-          btn.innerHTML = `🔓 Bajar Pinza de Sujeción`;
-          btn.style.background = "#1e293b";
-          btn.style.color = "#38bdf8";
-          btn.style.borderColor = "var(--border)";
-          if (padNote) padNote.innerHTML = `Arrastra con el ratón/dedo directamente sobre el ocular o usa la cruceta para alinear el centro óptico con el cruce de la retícula antes de medir.`;
-        }
+        btn.dataset.clamped = frontoState.clamped ? 'true' : 'false';
+        btn.textContent = frontoState.clamped ? 'Levantar pinza' : 'Bajar pinza';
+      }
+      if (padNote) {
+        padNote.innerHTML = frontoState.clamped
+          ? '<strong class="state-ok">Lente inmovilizada:</strong> la pinza mantiene la lente fija para medir o marcar sin desviaciones.'
+          : 'Arrastrá con el ratón o el dedo directamente sobre el ocular, o usá la cruceta para alinear el centro óptico con el cruce de la retícula antes de medir.';
       }
       FrontoAudio.playClamp(frontoState.clamped);
       drawFrontoCanvas();
@@ -4340,10 +2397,7 @@
       frontoState.markingProgress = 0;
       
       const btn = document.getElementById('btnFrontoMark');
-      if (btn) {
-        btn.style.transform = "scale(0.94)";
-        setTimeout(() => { btn.style.transform = "scale(1)"; }, 150);
-      }
+      if (btn) btn.blur();
 
       FrontoAudio.playMarker();
 
@@ -4607,7 +2661,7 @@
 
       // Cursor de eje
       frontoCtx.save();
-      frontoCtx.strokeStyle = "rgba(225, 29, 72, 0.75)";
+      frontoCtx.strokeStyle = 'rgba(225, 29, 72, 0.75)';
       frontoCtx.lineWidth = 1.2;
       frontoCtx.setLineDash([6, 4]);
       frontoCtx.beginPath();
@@ -4618,7 +2672,7 @@
       [-1, 1].forEach(side => {
         const ax = cx + side * dialR * Math.cos(frontoRad);
         const ay = cy - side * dialR * Math.sin(frontoRad);
-        frontoCtx.fillStyle = "#e11d48";
+        frontoCtx.fillStyle = '#e11d48';
         frontoCtx.beginPath();
         frontoCtx.arc(ax, ay, 3.5, 0, Math.PI * 2);
         frontoCtx.fill();
@@ -4879,7 +2933,7 @@
       ctx.fillText('Apoyo',36,29);ctx.fillText('Pinza',205,47);ctx.fillText('Mesa',198,table+3);
       ctx.restore();
       const label = frontoState.lensMode === 'frame_od' ? 'Montura OD' : frontoState.lensMode === 'frame_os' ? 'Montura OI' : 'Lente suelta';
-      document.getElementById('benchState').textContent = frontoState.lensLoaded ? label + ' · cara posterior hacia el apoyo' + (frontoState.marked ? ' · tres puntos marcados' : '') : 'Apoyo libre';
+      document.getElementById('benchState').textContent = frontoState.lensLoaded ? label + ', cara posterior hacia el apoyo' + (frontoState.marked ? ', tres puntos marcados' : '') : 'Apoyo libre';
     }
 
     function setFrontoDrum(val) {
@@ -4987,11 +3041,13 @@
       setFrontoLampIntensity(100);
 
       const btnClamp = document.getElementById('btnClampToggle');
+      const padNote = document.getElementById('frontoPadNote');
       if (btnClamp) {
-        btnClamp.innerHTML = `🔓 Bajar Pinza de Sujeción`;
-        btnClamp.style.background = "#1e293b";
-        btnClamp.style.color = "#38bdf8";
-        btnClamp.style.borderColor = "var(--border)";
+        btnClamp.dataset.clamped = 'false';
+        btnClamp.textContent = 'Bajar pinza';
+      }
+      if (padNote) {
+        padNote.textContent = 'Arrastrá con el ratón o el dedo directamente sobre el ocular, o usá la cruceta para alinear el centro óptico con el cruce de la retícula antes de medir.';
       }
 
       setFrontoLensMode('unmounted');
@@ -5199,11 +3255,9 @@
       if (!document.fullscreenElement && container.classList.contains('fullscreen-active')) {
         container.classList.remove('fullscreen-active');
         const fsBtn = document.getElementById('frontoFsBtn');
-        const fsIcon = document.getElementById('frontoFsIcon');
         const fsTxt = document.getElementById('frontoFsTxt');
         if (fsBtn) fsBtn.classList.remove('active');
-        if (fsIcon) fsIcon.textContent = '⛶';
-        if (fsTxt) fsTxt.textContent = 'Pantalla Completa';
+        if (fsTxt) fsTxt.textContent = 'Pantalla completa';
         setTimeout(() => {
           drawFrontoCanvas();
           drawFrontoDrumCanvas();
@@ -5305,9 +3359,11 @@
         container.appendChild(btn);
       });
 
-      document.getElementById('quizFeedbackBox').style.display = 'none';
-      document.getElementById('quizLoadBtn').style.display = 'none';
-      document.getElementById('quizNextBtn').style.display = 'none';
+      const fb = document.getElementById('quizFeedbackBox');
+      fb.style.display = 'none';
+      delete fb.dataset.result;
+      document.getElementById('quizLoadBtn').hidden = true;
+      document.getElementById('quizNextBtn').hidden = true;
     }
 
     function answerQuiz(selectedIndex, clickedBtn, correctText) {
@@ -5327,16 +3383,11 @@
 
       const feedback = document.getElementById('quizFeedbackBox');
       feedback.style.display = 'block';
+      feedback.dataset.result = isCorrect ? 'correct' : 'wrong';
       if (isCorrect) {
-        feedback.style.background = "rgba(34, 197, 94, 0.2)";
-        feedback.style.border = "1px solid #22c55e";
-        feedback.style.color = "#4ade80";
-        feedback.innerHTML = `<strong>¡Excelente! Respuesta Correcta.</strong> Es un <em>${correctText}</em>.`;
+        feedback.innerHTML = `<strong class="state-ok">Respuesta correcta.</strong> Corresponde a <em>${correctText}</em>.`;
       } else {
-        feedback.style.background = "rgba(244, 63, 94, 0.2)";
-        feedback.style.border = "1px solid #f43f5e";
-        feedback.style.color = "#fb7185";
-        feedback.innerHTML = `<strong>Incorrecto.</strong> La respuesta correcta es <em>${correctText}</em>.`;
+        feedback.innerHTML = `<strong class="state-bad">Respuesta incorrecta.</strong> La opción correcta es <em>${correctText}</em>.`;
       }
 
       const { sph, cyl, axis } = quizState.currentRecipe;
@@ -5345,8 +3396,8 @@
       reasoning.textContent = `M1 (esfera) = ${formatDiopter(optics.p1)}. M2 (esfera + cilindro) = ${formatDiopter(optics.p2)}. ${optics.explanation}`;
       feedback.appendChild(reasoning);
 
-      document.getElementById('quizLoadBtn').style.display = 'inline-flex';
-      document.getElementById('quizNextBtn').style.display = 'inline-flex';
+      document.getElementById('quizLoadBtn').hidden = false;
+      document.getElementById('quizNextBtn').hidden = false;
     }
 
     function loadQuizRecipeIntoSimulator() {
@@ -5379,10 +3430,9 @@
     });
   </script>
 
-  <!-- BOTÓN FLOTANTE RÁPIDO PARA MÓVIL AL SCROLLEAR -->
-  <button class="mobile-floating-grad-btn" id="mobileFloatingGradBtn" onclick="openMobileGraduation()" title="Modificar Graduación">
-    <svg width="17" height="17" fill="var(--primary)" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-    <span>Receta: <strong id="mobileFabRecipe" style="color: var(--primary);">-2.50 () -1.75 a 45°</strong></span>
+  <button type="button" class="mobile-floating-grad-btn" id="mobileFloatingGradBtn" onclick="openMobileGraduation()" title="Modificar graduación">
+    <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><circle cx="11" cy="18" r="1.5" fill="currentColor"/></svg>
+    <span>Receta: <strong id="mobileFabRecipe">-2.50 esf · -1.75 cil × 45°</strong></span>
   </button>
 </body>
 </html>
